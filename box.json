@@ -1,0 +1,38 @@
+{
+    "name":"Escher",
+    "version":"1.0.0",
+    "author":"Brad Wood",
+    "location":"ForgeboxStorage",
+    "homepage":"",
+    "documentation":"",
+    "repository":{
+        "type":"",
+        "URL":""
+    },
+    "bugs":"",
+    "slug":"commandbox-escher",
+    "shortDescription":"CLI UI drawing library",
+    "description":"",
+    "instructions":"",
+    "changelog":"",
+    "type":"commandbox-modules",
+    "keywords":"",
+    "private":false,
+    "projectURL":"",
+    "license":[
+        {
+            "type":"",
+            "URL":""
+        }
+    ],
+    "contributors":[],
+    "dependencies":{},
+    "devDependencies":{},
+    "installPaths":{},
+    "scripts":{},
+    "ignore":[
+        "**/.*",
+        "/test/",
+        "/tests/"
+    ]
+}
