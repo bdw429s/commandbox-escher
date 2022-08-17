@@ -11,9 +11,9 @@ component {
 			getInstance( 'HorizontalPanel@escher' )
 				.addPane(
 					getInstance( 'VerticalPanel@escher' )
-					.addPane( getInstance( 'Time@escher' ) )
-					.addPane( getInstance( 'Time@escher' ) )
-					.addPane( getInstance( 'Time@escher' ) ),
+						.addPane( getInstance( 'Time@escher' ) )
+						.addPane( getInstance( 'Time@escher' ) )
+						.addPane( getInstance( 'Time@escher' ) ),
 					'75%'
 				 )
 				.addPane( getInstance( 'VerticalPanel@escher' )

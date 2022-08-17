@@ -1,3 +1,7 @@
+/**
+ * I am the interface you need to implement to create a drawable widget on the screen using the Painter
+ * You can implement me directly, or extend the AbstractWidget
+ */
 interface {
 
     /**

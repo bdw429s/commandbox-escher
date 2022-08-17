@@ -1,8 +1,17 @@
+/**
+ * I scroll text data in a window
+ * I am just a proof of concept, perhaps make me extendable and have subclasses that provide my data.
+ * Or perhaps we don't even need a sub clas, but rather pass a closure to produce the data so I can be more resuable
+ */
 component extends='escher.models.AbstractWidget' {
     variables.data  = [];
 
     struct function render( required numeric height, required numeric width ) {
+        // This data can come from anywhere-- and should probabkly be fed in a separate thread
+        // so, if it's expensive to get, it doesn't slow down rendering.
+        // Also, this array is never cleaned so it will grow forever, lol
         data.append( messages[ randRange(1,12) ] );
+
         setLines( data );
 
         return super.render( argumentCollection=arguments );
