@@ -3,16 +3,14 @@
  * I am just a proof of concept, perhaps make me extendable and have subclasses that provide my data.
  * Or perhaps we don't even need a sub clas, but rather pass a closure to produce the data so I can be more resuable
  */
-component extends='escher.models.AbstractWidget' {
-    property name="serverService" inject="serverService";
+component extends='escher.models.AbstractWidget' accessors=true {
+    property name="file" value="";
     variables.data  = [];
 
     function process() {
         while( isActive() ) {
-            var serverInfo = serverService.getFirstServer();
-            data = getTail(serverInfo.consolelogPath)
+            var data = getTail(variables.file,7)
             setLines( data );
-
             sleep( 500 )
         }
     }
@@ -20,9 +18,8 @@ component extends='escher.models.AbstractWidget' {
     /**
 	 * @path file or directory to tail or raw input to process
 	 * @lines number of lines to display.
-	 * @follow Keep outputting new lines to the file until Ctrl-C is pressed
 	 **/
-     function getTail( required path, numeric lines = 15, boolean follow = false ){//formatServerLog
+     function getTail( required path, numeric lines = 15 ){//formatServerLog
 		var filePath =  arguments.path ;
 
         if( !fileExists( filePath ) ) return [];
