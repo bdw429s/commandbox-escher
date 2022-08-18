@@ -21,8 +21,7 @@ component {
 			getInstance( 'VerticalPanel@escher' )
 				.addPane( 
 					getInstance( 'HorizontalPanel@escher' )
-						.addPane( getInstance( 'Time@escher' ) )
-						.addPane( getInstance( 'Time@escher' ) )
+						.addPane( getInstance( 'Scroller@escher' ) )
 						.addPane( getInstance( 'Time@escher' ) )
 				)
 				.addPane( 
