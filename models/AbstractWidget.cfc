@@ -51,6 +51,10 @@ component implements='escher.models.IDrawable' accessors=true {
 
         var data = {
             lines : variables.lines
+                .reduce( function( result, i ) {
+                    result.append( toString( i ).listToArray( chr( 13 ) & chr( 10 ) ), true );
+                    return result;
+                }, [] )
         };
 
         // Only set if not null
