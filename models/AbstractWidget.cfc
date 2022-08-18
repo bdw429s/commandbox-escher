@@ -126,7 +126,10 @@ component implements='escher.models.IDrawable' accessors=true {
         // It's free to keep running if it wants
        setFuture(
             getTaskScheduler()
-                .newSchedule( ()=>process() )
+                .newSchedule( ()=>{
+                    setting requestTimeout=999999999;
+                    process();
+                } )
                 .start()
         );
 
