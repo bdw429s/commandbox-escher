@@ -134,8 +134,9 @@ component extends='escher.models.AbstractWidget' {
                         // Add our borders and buffers
                         var line =  box.v & " " & l;
                         // Fill in any empty space if the pane didn't render enough space to fill the width
-                        if( len( l ) < width ) {
-                            line &= repeatString( ' ', width - len( l ) )
+                        var rawLen = attr.stripAnsi( l ).length();
+                        if( rawLen < width ) {
+                            line &= repeatString( ' ', width - rawLen )
                         }
                         return line & " " & box.v;
                     } )

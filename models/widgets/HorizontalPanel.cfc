@@ -147,8 +147,9 @@ component extends='escher.models.AbstractWidget' {
                 if( row <= panes[ paneNo ].lines.len() ) {
                     thisRow &= panes[ paneNo ].lines[ row ];
                     // If the pane didn't generate a wide enough line, pad this pane's content with spaces
-                    if( panes[ paneNo ].lines[ row ].length() < panes[ paneNo ].actualWidth ) {
-                        thisRow &= repeatString( ' ', panes[ paneNo ].actualWidth-panes[ paneNo ].lines[ row ].length() );
+                    var rawLen = panes[ paneNo ].lines[ row ].length();
+                    if( rawLen < panes[ paneNo ].actualWidth ) {
+                        thisRow &= repeatString( ' ', panes[ paneNo ].actualWidth-rawLen );
                     }
                 // If the pane gave us no content, just fill this row with spaces
                 } else {

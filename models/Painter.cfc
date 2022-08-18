@@ -103,7 +103,8 @@ component singleton accessors=true {
 			display.resize( height, width );
 
 			var renderedContent = getWidget().render( height-1, width );
-			var lines = renderedContent.lines;
+			var lines = renderedContent.lines
+				.map( (l)=>attr.fromAnsi(l) );
 			var cursorPosInt = 0;
 			if( renderedContent.keyExists( 'cursorPosition' ) ) {
 				cursorPosInt = terminal.getSize().cursorPos( renderedContent.cursorPosition.row-1, renderedContent.cursorPosition.col-1 );

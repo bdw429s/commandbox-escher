@@ -61,11 +61,11 @@ component implements='escher.models.IDrawable' accessors=true {
         // Trim lines too long.  We could throw an error, but for now we just truncate
         data.lines = data.lines.map( (l) => {
             // toString() is important as AttributedString's constructor doesn't like "simple values" like dates
-            var al = attr.init( toString( l ) );
-            if( al.length() > width ) {
-                al = al.subSequence( 0, width )
+            if( attr.stripAnsi( toString( l ) ).length() > width ) {
+                return attr.fromAnsi( toString( l ) ).subSequence( 0, width ).toString();
+
             }
-            return al;
+            return l;
          } );
 
         // Trim to terminal height so the screen doesn't go all jumpy

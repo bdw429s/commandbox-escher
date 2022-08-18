@@ -8,6 +8,10 @@ component {
 	*/
 	function run() {
 		getInstance( 'Painter@escher' ).start(
+			getInstance( 'weather@escher' )
+		);
+		//return;
+		getInstance( 'Painter@escher' ).start(
 			getInstance( 'HorizontalPanel@escher' )
 				.addPane(
 					getInstance( 'VerticalPanel@escher' )
