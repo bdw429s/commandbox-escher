@@ -7,7 +7,7 @@ component extends='escher.models.AbstractWidget' {
     variables.data  = [];
 
     function process() {
-        while( true ) {
+        while( isActive() ) {
 
             // This data can come from anywhere-- and should probabkly be fed in a separate thread
             // so, if it's expensive to get, it doesn't slow down rendering.

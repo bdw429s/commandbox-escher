@@ -18,6 +18,7 @@ component implements='escher.models.IDrawable' accessors=true {
 
 	processingdirective pageEncoding='UTF-8';
 
+    variables.lines = [];
     // Re-usable Java proxy for creating attributed strings
 	variables.attr = createObject( 'java', 'org.jline.utils.AttributedString' );
     // Helper with border chars for box drawing
@@ -117,6 +118,10 @@ component implements='escher.models.IDrawable' accessors=true {
      * You are responsible for also starting any composed widgets here
      */
     function start() {
+
+        // Mark widget as active
+        setActive( true );
+
         // Fire up our process method in its own thread
         // It's free to keep running if it wants
        setFuture(
@@ -125,8 +130,6 @@ component implements='escher.models.IDrawable' accessors=true {
                 .start()
         );
 
-        // Mark widget as active
-        setActive( true );
     }
 
     /**
@@ -134,6 +137,10 @@ component implements='escher.models.IDrawable' accessors=true {
      * You are responsible for also stopping any composed widgets here
      */
     function stop() {
+
+        // Mark widget as inactive
+        setActive( false );
+
         // Interrupt the process thread if it's still running
         getFuture().cancel();
         // Wait for it to finish (if interrupted, it could take a second to finish)
@@ -143,8 +150,6 @@ component implements='escher.models.IDrawable' accessors=true {
             // Throws CancellationException
         }
 
-        // Mark widget as inactive
-        setActive( false );
     }
 
     /**

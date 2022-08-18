@@ -6,7 +6,7 @@ component extends='escher.models.AbstractWidget' {
     processingdirective pageEncoding='UTF-8';
 
     function process() {
-        while( true ) {
+        while( isActive() ) {
             var dateTime = dateTimeFormat( now(), 'mm/dd/yyyy hh:nn:ss tt' ).listtoArray( '' );
             // My ASCII art letters are 5 rows tall, so map the characters inour string to each of the rows below
             setLines(

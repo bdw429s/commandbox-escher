@@ -1,28 +1,17 @@
 component extends='escher.models.AbstractWidget' {
-    variables.data      = [];
-    variables.loaded    = false;
     variables.location  = {};
 
-    struct function render( required numeric height, required numeric width ) {
+    setLines( [
+        'Gathering weather data....'
+    ] );
 
-        if ( !variables.loaded ){
+    function process() {
+        while( isActive() ){
+
+            var data = [];
+
             try{
-                // get current location
-                cfhttp(
-                    url = "https://ipinfo.io/",
-                    result = "location"
-                ){
-                    cfhttpParam(
-                        type="header",
-                        name="Accept",
-                        value="application/json"
-                    )
-                }
-
-                location = isJSON( location.fileContent ) ?
-                            deserializeJSON( location.fileContent ) :
-                            { city:"Houston", region:"Texas" }
-
+                var location = getLocation();
                 cfhttp(
                     url = "https://wttr.in/#location.city#, #location.region#",
                     useragent="curl/7.54.1"
@@ -35,12 +24,42 @@ component extends='escher.models.AbstractWidget' {
                     e.message
                 ]
             }
+            data.append( 'Last updated #dateTimeFormat( now(), 'mm/dd/yyyy hh:nn:ss tt' )#' );
 
             setLines( data );
-            variables.loaded = true;
+
+            // Update once per minute
+            sleep( 60 * 1000 )
         }
 
-        return super.render( argumentCollection=arguments );
+    }
+
+    function getLocation() {
+        if( variables.location.count() ) {
+            return variables.location;
+        }
+
+        try{
+            // get current location
+            cfhttp(
+                url = "https://ipinfo.io/",
+                result = "location"
+            ){
+                cfhttpParam(
+                    type="header",
+                    name="Accept",
+                    value="application/json"
+                )
+            }
+
+            location = isJSON( location.fileContent ) ?
+                        deserializeJSON( location.fileContent ) :
+                        { city:"Houston", region:"Texas" }
+
+        }
+        catch ( any e ){}
+
+        return variables.location;
     }
 
 }
