@@ -8,7 +8,10 @@ component extends='escher.models.AbstractWidget' accessors=true {
     variables.data  = [];
 
     function process() {
+		setLabel( variables.file.listLast( '/\' ) );
         while( isActive() ) {
+
+		setLabel( listLast( variables.file.toString(), '/\' ) );
             var data = getTail(variables.file,7)
             setLines( data );
             sleep( 500 )
@@ -22,10 +25,10 @@ component extends='escher.models.AbstractWidget' accessors=true {
      function getTail( required path, numeric lines = 15 ){//formatServerLog
 		var filePath =  arguments.path ;
 
-        if( !fileExists( filePath ) ) return [];
-        
+        if( !fileExists( filePath ) ) return ['Log file not found'];
+
 		variables.file = createObject( "java", "java.io.File" ).init( filePath );
-        
+
 		var startPos = findStartPos();
 		var startingLength = 0;
 

@@ -7,6 +7,7 @@ component extends='escher.models.AbstractWidget' {
     variables.data  = [];
 
     function process() {
+        setLabel( print.red('Cool') & print.white(' stuff') & print.blue(' here') );
         while( isActive() ) {
 
             // This data can come from anywhere-- and should probabkly be fed in a separate thread

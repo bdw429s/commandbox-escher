@@ -15,6 +15,7 @@ component implements='escher.models.IDrawable' accessors=true {
 	property name='taskScheduler';
 	property name='future';
 	property name='UUID' default="#createUUID()#";
+    property name='label' type='string' default='';
 
 	processingdirective pageEncoding='UTF-8';
 
@@ -128,7 +129,11 @@ component implements='escher.models.IDrawable' accessors=true {
             getTaskScheduler()
                 .newSchedule( ()=>{
                     setting requestTimeout=999999999;
-                    process();
+                    try {
+                        process();
+                    } catch( any e ) {
+                        setLines( [ 'widget error: #e.message# #e.detail#' ] )
+                    }
                 } )
                 .start()
         );
@@ -164,5 +169,13 @@ component implements='escher.models.IDrawable' accessors=true {
      */
     function process() {
         // Default process does nothing
+    }
+
+
+    /**
+     * Return label for this widget, if set
+     */
+    string function getLabel() {
+        return variables.label;
     }
 }

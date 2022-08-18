@@ -42,4 +42,9 @@ interface {
      */
     function process();
 
+    /**
+     * Return label for this widget, if set
+     */
+    string function getLabel();
+
 }

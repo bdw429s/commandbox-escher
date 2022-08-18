@@ -13,7 +13,6 @@ component extends='escher.models.AbstractWidget' {
     property name="panes" type="array";
 
     variables.panes=[];
-
     /**
      * Allow panes to be added via constructor, HOWEVER ther is no way to pass width in this case
     * HorizontalPanel.init( widget1, widget2, widget3 )
@@ -50,6 +49,7 @@ component extends='escher.models.AbstractWidget' {
      * @width current width constraint
      */
     struct function render( required numeric height, required numeric width ) {
+
         // I need this to pass to super.render() below.
         var originalHeight = height;
         var originalWidth = width;
@@ -128,9 +128,16 @@ component extends='escher.models.AbstractWidget' {
         var topRow = box.ul & box.h;
         var bottomRow = box.bl & box.h;
         loop from=1 to=panes.len() index="local.paneNo" {
+            var pane = panes[ paneNo ];
+            var paneLabel = pane.widget.getLabel();
+            if( len( paneLabel ) ) {
+                topRow &= box.h & box.h & ' ' & paneLabel & ' ' & repeatString( box.h, pane.actualWidth-attr.stripAnsi( paneLabel ).length()-4 )
+            } else {
+                topRow &= repeatString( box.h, pane.actualWidth )
+            }
+
             // Add border chars to represent each pane content width
-            topRow &= repeatString( box.h, panes[ paneNo ].actualWidth )
-            bottomRow &= repeatString( box.h, panes[ paneNo ].actualWidth )
+            bottomRow &= repeatString( box.h, pane.actualWidth )
             // At the break between panes, put our junction char in
             if( paneNo < panes.len() ) {
                 topRow &= box.h & box.vt & box.h;
@@ -146,18 +153,19 @@ component extends='escher.models.AbstractWidget' {
             var thisRow = box.v & ' ';
             // Now, grab the current line from each pane to assemble
             loop from=1 to=panes.len() index="local.paneNo" {
+                var pane = panes[ paneNo ];
                 // If our pane has content for this row, use it (the pane may not have rendered all the rows available)
-                if( row <= panes[ paneNo ].lines.len() ) {
-                    thisRow &= panes[ paneNo ].lines[ row ];
+                if( row <= pane.lines.len() ) {
+                    thisRow &= pane.lines[ row ];
                     // If the pane didn't generate a wide enough line, pad this pane's content with spaces
 
-                    var rawLen = attr.stripAnsi( panes[ paneNo ].lines[ row ] ).length();
-                    if( rawLen < panes[ paneNo ].actualWidth ) {
-                        thisRow &= repeatString( ' ', panes[ paneNo ].actualWidth-rawLen );
+                    var rawLen = attr.stripAnsi( pane.lines[ row ] ).length();
+                    if( rawLen < pane.actualWidth ) {
+                        thisRow &= repeatString( ' ', pane.actualWidth-rawLen );
                     }
                 // If the pane gave us no content, just fill this row with spaces
                 } else {
-                    thisRow &= repeatString( ' ', panes[ paneNo ].actualWidth );
+                    thisRow &= repeatString( ' ', pane.actualWidth );
                 }
                 //  For all panes but the last, put in our vertical beam and padding between panes
                 if( paneNo < panes.len() ) {

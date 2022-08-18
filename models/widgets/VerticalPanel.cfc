@@ -123,7 +123,12 @@ component extends='escher.models.AbstractWidget' {
 
         var finalLines = [];
         // Top border line
-        finalLines.append( box.ul & repeatString( box.h, width+2 ) & box.ur )
+        var paneLabel = panes.first().widget.getLabel();
+        if( len( paneLabel ) ) {
+            finalLines.append( box.ul & box.h & box.h & ' ' & paneLabel & ' ' & repeatString( box.h, width+2-attr.stripAnsi( paneLabel ).length()-4 ) & box.ur )
+        } else {
+            finalLines.append( box.ul & repeatString( box.h, width+2 ) & box.ur )
+        }
         var paneNo = 0;
         // Loop over the panes, we'll assemble them as we go
         for( var pane in panes ) {
@@ -152,7 +157,12 @@ component extends='escher.models.AbstractWidget' {
             }
             // For all panes but the last, but in our horizontal beam separator
             if( paneNo < panes.len() ) {
-                finalLines.append( box.hl & repeatString( box.h, width+2 ) & box.hr )
+                var paneLabel = panes[paneNo+1].widget.getLabel();
+                if( len( paneLabel ) ) {
+                    finalLines.append( box.hl & box.h & box.h & ' ' & paneLabel & ' ' & repeatString( box.h, width+2-attr.stripAnsi( paneLabel ).length()-4 ) & box.hr )
+                } else {
+                    finalLines.append( box.hl & repeatString( box.h, width+2 ) & box.hr )
+                }
             }
         }
         // Bottom border line

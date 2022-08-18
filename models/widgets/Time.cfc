@@ -7,7 +7,9 @@ component extends='escher.models.AbstractWidget' {
 
     function process() {
         while( isActive() ) {
-            var dateTime = dateTimeFormat( now(), 'mm/dd/yyyy hh:nn:ss tt' ).listtoArray( '' );
+            var dateTimeString = dateTimeFormat( now(), 'mm/dd/yyyy hh:nn:ss tt' );
+            var dateTime = dateTimeString.listtoArray( '' );
+            setLabel( dateTimeString );
             // My ASCII art letters are 5 rows tall, so map the characters inour string to each of the rows below
             setLines(
                 [
