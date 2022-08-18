@@ -21,5 +21,10 @@ interface {
      */
     struct function render( required numeric height, required numeric width );
 
+    function start();
+
+    function stop();
+
+    function process();
 
 }

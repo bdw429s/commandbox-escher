@@ -4,12 +4,18 @@
 component implements='escher.models.IDrawable' accessors=true {
     // DI
 	property name="print" inject="print";
+	property name='wirebox' inject='wirebox';
 
     // Store row/col struct for current cursor position.  Not needed if this widget doesn't ever need the cursor drawn
     // If null, it means the widget does not require the cursor to be anywhere on screen and it will not be sent back from render()
     property name="cursorPosition" type="struct";
     // Array of "lines" of text representing the output of this widget
     property name="lines" type="array";
+    property name="active" type="boolean" default=false;
+	property name='taskScheduler';
+	property name='future';
+	property name='UUID' default="#createUUID()#";
+
 	processingdirective pageEncoding='UTF-8';
 
     // Re-usable Java proxy for creating attributed strings
@@ -29,12 +35,15 @@ component implements='escher.models.IDrawable' accessors=true {
 		sh : '░' // Shadow
     };
 
+	function onDIComplete() {
+		setTaskScheduler( wirebox.getTaskScheduler() );
+	}
+
     /**
      * @Returns true/false if widget is active
      */
     boolean function isActive() {
-        // Default implementation for widgets which run forever
-        return true;
+        return getActive();
     }
 
     /**
@@ -103,4 +112,28 @@ component implements='escher.models.IDrawable' accessors=true {
         };
     }
 
+    function start() {
+
+        setFuture(
+            getTaskScheduler().newSchedule( ()=>process() )
+                .start()
+        );
+
+        setActive( true );
+    }
+
+    function stop() {
+        getFuture().cancel();
+        try {
+            getFuture().get();
+        } catch(any e) {
+            // Throws CancellationException
+        }
+
+        setActive( false );
+    }
+
+    function process() {
+
+    }
 }

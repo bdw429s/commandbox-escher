@@ -8,7 +8,7 @@ component {
 	*/
 	function run() {
 		getInstance( 'Painter@escher' ).start(
-			getInstance( 'weather@escher' )
+			getInstance( 'scroller@escher' )
 		);
 		//return;
 		getInstance( 'Painter@escher' ).start(

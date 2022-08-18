@@ -34,6 +34,7 @@ component singleton accessors=true {
 	*
 	*/
 	function start(iDrawable widget  ) {
+		widget.start();
 		setWidget( arguments.widget );
 
 		// If we have a dumb terminal or are running inside a CI server, skip the screen redraws all together.
@@ -69,6 +70,8 @@ component singleton accessors=true {
 	*
 	*/
 	function stop() {
+
+		widget.stop();
 
 		if( getActive() ) {
 			lock timeout="20" name="ConsolePainter" type="exclusive" {

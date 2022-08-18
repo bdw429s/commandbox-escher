@@ -5,20 +5,22 @@
 component extends='escher.models.AbstractWidget' {
     processingdirective pageEncoding='UTF-8';
 
-    struct function render( required numeric height, required numeric width ) {
-        var dateTime = dateTimeFormat( now(), 'mm/dd/yyyy hh:nn:ss tt' ).listtoArray( '' );
-        // My ASCII art letters are 5 rows tall, so map the characters inour string to each of the rows below
-        setLines(
-            [
-                dateTime.map( (c)=>rows[1][ rowMap[c] ] ).toList( '' ),
-                dateTime.map( (c)=>rows[2][ rowMap[c] ] ).toList( '' ),
-                dateTime.map( (c)=>rows[3][ rowMap[c] ] ).toList( '' ),
-                dateTime.map( (c)=>rows[4][ rowMap[c] ] ).toList( '' ),
-                dateTime.map( (c)=>rows[5][ rowMap[c] ] ).toList( '' )
-            ]
-        );
+    function process() {
+        while( true ) {
+            var dateTime = dateTimeFormat( now(), 'mm/dd/yyyy hh:nn:ss tt' ).listtoArray( '' );
+            // My ASCII art letters are 5 rows tall, so map the characters inour string to each of the rows below
+            setLines(
+                [
+                    dateTime.map( (c)=>rows[1][ rowMap[c] ] ).toList( '' ),
+                    dateTime.map( (c)=>rows[2][ rowMap[c] ] ).toList( '' ),
+                    dateTime.map( (c)=>rows[3][ rowMap[c] ] ).toList( '' ),
+                    dateTime.map( (c)=>rows[4][ rowMap[c] ] ).toList( '' ),
+                    dateTime.map( (c)=>rows[5][ rowMap[c] ] ).toList( '' )
+                ]
+            );
+            sleep( 1000 );
+        }
 
-        return super.render( argumentCollection=arguments );
     }
 
     // TODO, support other fonts?  Perhaps an entire library that converts text to ASCII art?

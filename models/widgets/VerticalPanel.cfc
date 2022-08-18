@@ -38,6 +38,9 @@ component extends='escher.models.AbstractWidget' {
             requestedHeight : height,
             actualHeight : 0
         } );
+        if( isActive() ) {
+            widget.start();
+        }
         return this;
     }
 
@@ -158,6 +161,16 @@ component extends='escher.models.AbstractWidget' {
         setLines( finalLines );
         // Let abstract class clean up data (truncate) and convert strings to AttributedStrings, as well as create final render output struct.
         return super.render( originalHeight, originalWidth );
+    }
+
+    function start() {
+        panes.each( (p)=>p.widget.start() );
+        super.start();
+    }
+
+    function stop() {
+        panes.each( (p)=>p.widget.stop() );
+        super.stop();
     }
 
 }

@@ -6,15 +6,18 @@
 component extends='escher.models.AbstractWidget' {
     variables.data  = [];
 
-    struct function render( required numeric height, required numeric width ) {
-        // This data can come from anywhere-- and should probabkly be fed in a separate thread
-        // so, if it's expensive to get, it doesn't slow down rendering.
-        // Also, this array is never cleaned so it will grow forever, lol
-        data.append( print.text( messages[ randRange(1,12) ], 'color#randRange(1,255)#' ) );
+    function process() {
+        while( true ) {
 
-        setLines( data );
+            // This data can come from anywhere-- and should probabkly be fed in a separate thread
+            // so, if it's expensive to get, it doesn't slow down rendering.
+            // Also, this array is never cleaned so it will grow forever, lol
+            data.append( print.text( messages[ randRange(1,12) ], 'color#randRange(1,255)#' ) );
 
-        return super.render( argumentCollection=arguments );
+            setLines( data );
+
+            sleep( 500 )
+        }
     }
 
     messages = [
