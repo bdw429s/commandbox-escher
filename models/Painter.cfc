@@ -33,7 +33,7 @@ component singleton accessors=true {
 	* Starts up the scheduled painting thread if not already started
 	*
 	*/
-	function start(iDrawable widget  ) {
+	function start(iDrawable widget ) {
 		widget.start();
 		setWidget( arguments.widget );
 

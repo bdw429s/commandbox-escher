@@ -150,7 +150,8 @@ component extends='escher.models.AbstractWidget' {
                 if( row <= panes[ paneNo ].lines.len() ) {
                     thisRow &= panes[ paneNo ].lines[ row ];
                     // If the pane didn't generate a wide enough line, pad this pane's content with spaces
-                    var rawLen = panes[ paneNo ].lines[ row ].length();
+
+                    var rawLen = attr.stripAnsi( panes[ paneNo ].lines[ row ] ).length();
                     if( rawLen < panes[ paneNo ].actualWidth ) {
                         thisRow &= repeatString( ' ', panes[ paneNo ].actualWidth-rawLen );
                     }
