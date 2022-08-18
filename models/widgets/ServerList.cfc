@@ -6,7 +6,7 @@
 component extends='escher.models.AbstractWidget' {
     processingdirective pageEncoding='UTF-8';
     property name="serverService" inject="serverService";
-    
+
     function process(){
         while( isActive() ){
             var servers = serverService.getServers();
@@ -24,14 +24,19 @@ component extends='escher.models.AbstractWidget' {
                             "Version": thisServerInfo.engineVersion,
                             "HeapSize": thisServerInfo.heapSize
                         ]);
-                    } 
+                    }
                     return acc;
                 },[])
-            setLines([print.table(serverlist)])
+                if( serverlist.len() ) {
+                    setLines([print.table(serverlist)])
+                } else {
+                    setLines(['There are no servers running'])
+                }
+
             sleep(5000)
         }
     }
 
-   
+
 
 }
