@@ -19,8 +19,9 @@ component extends='escher.models.AbstractWidget' accessors=true {
             var maxLen = 73-getPrompt().len();
             setLines( [
                 print.blue( box.ul & repeatString( box.h, 75 ) & box.ur ),
-                print.blue( box.v ) & ' ' & getPrompt() & print.boldBlackOnSilverBackground( inputText & repeatString( ' ', 73-len(getPrompt() & inputText) ) ) & ' ' & print.blue( box.v ),
-                print.blue( box.bl & repeatString( box.h, 75 ) & box.br )
+                print.blue( box.v ) & ' ' & getPrompt() & print.boldBlackOnSilverBackground( inputText & repeatString( ' ', 73-len(getPrompt() & inputText) ) ) & ' ' & print.blue( box.v ) & print.grey( box.shs ),
+                print.blue( box.bl & repeatString( box.h, 75 ) & box.br ) & print.grey( box.shs ),
+                ' ' & print.grey( repeatString( box.shb, 77 ) )
             ] );
 
             var key = shell.waitForKey();

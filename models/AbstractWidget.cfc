@@ -35,7 +35,9 @@ component implements='escher.models.IDrawable' accessors=true {
 		hr : '╣', // horizonal right junction
 		vt : '╦', // vertical top junction
 		vb : '╩', // vertical bottom junction
-		sh : '░' // Shadow
+		shs : '█', // Shadow side
+        shb : '▀' // Shadow bottom
+
     };
 
 	function onDIComplete() {
