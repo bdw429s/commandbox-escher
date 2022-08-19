@@ -62,6 +62,7 @@ component implements='escher.models.IDrawable' accessors=true {
 
         var data = {
             lines : variables.lines
+                .map( (l)=>replace( l, chr(9), '    ', 'all' ) )
                 .reduce( function( result, i ) {
                     result.append( toString( i ).listToArray( chr( 13 ) & chr( 10 ) ), true );
                     return result;
