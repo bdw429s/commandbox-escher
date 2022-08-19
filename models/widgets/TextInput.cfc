@@ -15,8 +15,14 @@ component extends='escher.models.AbstractWidget' accessors=true {
 
     function process() {
         while( isActive() ){
-            setCursorPosition( 1, len( prompt )+cursorRow )
-            setLines( [getPrompt() & inputText] );
+            setCursorPosition( 2, len( prompt )+cursorRow+2 )
+            var maxLen = 73-getPrompt().len();
+            setLines( [
+                print.blue( box.ul & repeatString( box.h, 75 ) & box.ur ),
+                print.blue( box.v ) & ' ' & getPrompt() & print.boldBlackOnSilverBackground( inputText & repeatString( ' ', 73-len(getPrompt() & inputText) ) ) & ' ' & print.blue( box.v ),
+                print.blue( box.bl & repeatString( box.h, 75 ) & box.br )
+            ] );
+
             var key = shell.waitForKey();
             if( key.startsWith( 'key' ) ) {
                 switch( key ) {
@@ -48,7 +54,6 @@ component extends='escher.models.AbstractWidget' accessors=true {
                 switch( asc( key ) ) {
                     // backspace
                     case 8:
-
                         if(cursorRow==len(inputText)+1) {
                             if( cursorRow > 2 ) {
                                 inputText = inputText.left(-1);
@@ -78,6 +83,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
                         // nothing
                         break;
                     default:
+                        if( inputText.len() >= maxLen ) break;
+
                         if(cursorRow==len(inputText)+1) {
                             inputText &= key;
                         } else {
