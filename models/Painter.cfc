@@ -76,14 +76,18 @@ component singleton accessors=true {
 		if( getActive() ) {
 			lock timeout="20" name="ConsolePainter" type="exclusive" {
 				if( getActive() ) {
+					clear();
+
+					setActive( false );
+
 					getFuture().cancel();
 					try {
 						getFuture().get();
 					} catch(any e) {
 						// Throws CancellationException
 					}
-					setActive( false );
 					clear();
+
 				}
 			}
 		}

@@ -5,6 +5,7 @@ component implements='escher.models.IDrawable' accessors=true {
     // DI
 	property name="print" inject="print";
 	property name='wirebox' inject='wirebox';
+    property name='shell' inject='shell';
 
     // Store row/col struct for current cursor position.  Not needed if this widget doesn't ever need the cursor drawn
     // If null, it means the widget does not require the cursor to be anywhere on screen and it will not be sent back from render()
@@ -172,7 +173,6 @@ component implements='escher.models.IDrawable' accessors=true {
         } catch(any e) {
             // Throws CancellationException
         }
-
     }
 
     /**
