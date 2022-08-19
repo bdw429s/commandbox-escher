@@ -61,10 +61,22 @@ component implements='escher.models.IDrawable' accessors=true {
     struct function render( required numeric height, required numeric width ) {
 
         var data = {
-            lines : variables.lines
-                .map( (l)=>replace( l, chr(9), '    ', 'all' ) )
+            lines : duplicate( variables.lines )
+                // Replace tabs with spaces
+                .map( (l)=>replace( l, chr(9), '    ', 'all' )
+                    // Replace CRLF and LF with just CR
+                    .replace( chr(13) & chr(10), chr(10), 'all' )
+                    .replace( chr(13), chr(10), 'all' ) )
                 .reduce( function( result, i ) {
-                    result.append( toString( i ).listToArray( chr( 13 ) & chr( 10 ) ), true );
+                    // Break our ANSI string up on line breaks
+                    var as = attr.fromAnsi( toString( i ) );
+                    var ps = attr.stripAnsi( toString( i ) );
+                    var currPos = 1;
+                    while( var breakPosition = ps.reFind( '\n', currPos ) ) {
+                            result.append( as.subSequence( currPos-1, breakPosition-1 ).toAnsi() );
+                        currPos=breakPosition+1;
+                    }
+                    result.append( as.subSequence( currPos-1, ps.length() ).toAnsi() );
                     return result;
                 }, [] )
         };
@@ -133,7 +145,9 @@ component implements='escher.models.IDrawable' accessors=true {
                     try {
                         process();
                     } catch( any e ) {
-                        setLines( [ 'widget error: #e.message# #e.detail#' ] )
+                        if( !e.message contains 'interrupt' ) {
+                            setLines( [ 'widget error: #e.message# #e.detail#' ] )
+                        }
                     }
                 } )
                 .start()

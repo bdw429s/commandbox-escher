@@ -13,7 +13,7 @@ component extends='escher.models.AbstractWidget' {
             // This data can come from anywhere-- and should probabkly be fed in a separate thread
             // so, if it's expensive to get, it doesn't slow down rendering.
             // Also, this array is never cleaned so it will grow forever, lol
-            data.append( print.text( messages[ randRange(1,12) ], 'color#randRange(1,255)#' ) );
+            data.append( print.text( messages[ randRange(1,messages.len()) ], 'color#randRange(1,255)#' ) );
 
             setLines( data );
 
