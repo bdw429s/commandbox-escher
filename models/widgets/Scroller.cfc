@@ -3,7 +3,7 @@
  * I am just a proof of concept, perhaps make me extendable and have subclasses that provide my data.
  * Or perhaps we don't even need a sub clas, but rather pass a closure to produce the data so I can be more resuable
  */
-component extends='escher.models.AbstractWidget' {
+component extends='escher.models.AbstractWidget' accessors=true {
     variables.data  = [];
 
     function process() {

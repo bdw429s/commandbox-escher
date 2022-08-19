@@ -1,4 +1,4 @@
-component extends='escher.models.AbstractWidget' {
+component extends='escher.models.AbstractWidget' accessors=true {
     variables.location  = {};
 
     setLines( [

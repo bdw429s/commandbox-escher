@@ -8,7 +8,7 @@
  *
  * TODO: make border customizable or be able to turn off completely
  */
-component extends='escher.models.AbstractWidget' {
+component extends='escher.models.AbstractWidget' accessors=true {
     //  Array of panes to display.  Each item contains struct with widget CFC instance, requestedWith, actualWidth, and lines
     property name="panes" type="array";
 

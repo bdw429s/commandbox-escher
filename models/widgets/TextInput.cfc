@@ -12,7 +12,6 @@ component extends='escher.models.AbstractWidget' accessors=true {
         return this;
     }
 
-
     function process() {
         while( isActive() ){
             setCursorPosition( 2, len( prompt )+cursorRow+2 )

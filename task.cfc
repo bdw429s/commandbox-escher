@@ -7,12 +7,10 @@ component {
 	*
 	*/
 	function run() {
+
 		getInstance( 'Painter@escher' ).start(
-			getInstance( 'weather@escher' )
-		);
-		//return;
-		getInstance( 'Painter@escher' ).start(
-			getInstance( 'HorizontalPanel@escher' )
+			getInstance( 'OverlayPanel@escher' ).init(
+				getInstance( 'HorizontalPanel@escher' )
 				.addPane(
 					getInstance( 'VerticalPanel@escher' )
 						.addPane( getInstance( 'Time@escher' ) )
@@ -23,7 +21,9 @@ component {
 				.addPane( getInstance( 'VerticalPanel@escher' )
 					.addPane( getInstance( 'Scroller@escher' ) )
 					.addPane( getInstance( 'Scroller@escher' ) )
-				)
+				),
+				getInstance( 'textInput@escher' ).init( 'Enter Something: ' )
+			)
 		);
 		print.greenLine( 'Complete!' );
 	}
