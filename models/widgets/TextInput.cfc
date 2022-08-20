@@ -1,3 +1,6 @@
+/**
+ * I collect a line of text from the user.  Press enter to submit.
+ */
 component extends='escher.models.AbstractWidget' accessors=true {
     property name='inputText' type='string' default='';
     property name='cursorRow' type='numeric' default='1';
