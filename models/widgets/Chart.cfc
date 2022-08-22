@@ -5,7 +5,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
     property name='seriesData' type="array"
     property name='title' type="string" default="";
     property name='color' type="string" default="blue";
-    property name='YMax' type="numeric" default="100";
+    property name='YMax' type="any" default="auto";
     processingdirective pageEncoding='UTF-8';
 
     variables.seriesData = [];
@@ -42,6 +42,10 @@ component extends='escher.models.AbstractWidget' accessors=true {
             loop from=1 to=graphHeight index='local.i' {
                 theLines.append( '' )
             }
+            var thisYMax = YMax;
+            if( YMax == 'auto' ) {
+                thisYMax = seriesData.max();
+            }
             YMaxWidth = toString( YMax ).len();
             var row=0;
             theData.each( (p)=>{
@@ -51,22 +55,22 @@ component extends='escher.models.AbstractWidget' accessors=true {
                         if( i == 1 ) {
                             theLines[ i ] &= '1';
                         } else if( i == graphHeight ) {
-                            theLines[ i ] &= YMax;
+                            theLines[ i ] &= thisYMax;
                         } else if( i == int( graphHeight/2 ) ) {
-                            theLines[ i ] &= int(YMax/2);
+                            theLines[ i ] &= int(thisYMax/2);
                         } else {
                             theLines[ i ] &= ' ';
                         }
                     } else if( row <= YMaxWidth ) {
                         if( i == graphHeight && row <= YMaxWidth ) {
                             theLines[ i ] &= '';
-                        } else if( i == int( graphHeight/2 ) && row <= len( int(YMax/2) ) ) {
+                        } else if( i == int( graphHeight/2 ) && row <= len( int(thisYMax/2) ) ) {
                             theLines[ i ] &= '';
                         } else {
                             theLines[ i ] &= ' ';
                         }
                     } else {
-                        if( (p/YMax) > i/graphHeight ) {
+                        if( (p/thisYMax) > i/graphHeight ) {
                             theLines[ i ] &= print.t( char, color );
                         } else {
                             theLines[ i ] &= ' ';

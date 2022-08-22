@@ -14,7 +14,7 @@ component {
 				.addPane(
 					getInstance( 'VerticalPanel@escher' )
 						.addPane( getInstance( 'Time@escher' ) )
-						.addPane( getInstance( 'chart@escher' ).init( 'My Chart', 'red', 100 ) )
+						.addPane( getInstance( 'chart@escher' ).init( 'My Chart', 'red', 'auto' ) )
 						.addPane( getInstance( 'Time@escher' ) ),
 					'75%'
 				 )
