@@ -23,7 +23,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         while( isActive() ){
             var previousValue = seriesData.len() ? seriesData.last() : 50;
             if( previousvalue < 0 ) previousValue+=10
-            if( previousvalue > 100 ) previousValue-=10
+          //  if( previousvalue > 100 ) previousValue-=10
             seriesData.append( previousValue + randRange(-5,5) )
 
             if( seriesData.len() > lastWidth ) {
@@ -49,6 +49,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
             YMaxWidth = toString( YMax ).len();
             var row=0;
             theData.each( (p)=>{
+                // Remove this if/when we allow negative graph values
+                p=max(p,0);
                 row++;
                 loop from=1 to=graphHeight index='local.i' {
                     if( row == 1 ) {

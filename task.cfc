@@ -7,6 +7,7 @@ component {
 	*
 	*/
 	function run() {
+		
 
 		getInstance( 'Painter@escher' ).start(
 			getInstance( 'OverlayPanel@escher' ).init(
@@ -21,6 +22,7 @@ component {
 				.addPane( getInstance( 'VerticalPanel@escher' )
 					.addPane( getInstance( 'Scroller@escher' ) )
 					.addPane( getInstance( 'Scroller@escher' ) )
+					.setLabel( 'Log Files' )
 				)//,
 				//getInstance( 'textInput@escher' ).init( 'Enter Something: ' )
 			)

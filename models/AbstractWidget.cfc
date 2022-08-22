@@ -35,6 +35,8 @@ component implements='escher.models.IDrawable' accessors=true {
 		hr : '╣', // horizonal right junction
 		vt : '╦', // vertical top junction
 		vb : '╩', // vertical bottom junction
+		llb : '╡', // label left boundary
+		lrb : '╞', // label right boundary
 		shs : '█', // Shadow side
         shb : '▀', // Shadow bottom
         shls : '▄' // Shadow lower side
@@ -53,6 +55,26 @@ component implements='escher.models.IDrawable' accessors=true {
     }
 
     /**
+     * @Returns Gets widget lines in a thread safe manner
+     * The array of lines will be duplicated so any changes myst
+     * be set back via setLines() 
+     */
+    array function getLines() {
+        lock name='widget-lines-#UUID#' type='readOnly' {
+           return duplicate(  variables.lines );
+        }
+    }
+
+    /**
+     * @Returns Sets widget lines in a thread safe manner
+     */
+    function setLines( required array newLines ) {
+        lock name='widget-lines-#UUID#' type='exclusive' {
+           variables.lines = newLines;
+        }
+    }
+
+    /**
      * Renders contents of UI widget
      *
      * @height max height of renderable space
@@ -65,7 +87,7 @@ component implements='escher.models.IDrawable' accessors=true {
     struct function render( required numeric height, required numeric width ) {
 
         var data = {
-            lines : duplicate( variables.lines )
+            lines : getLines()
                 // Replace tabs with spaces
                 .map( (l)=>replace( l, chr(9), '    ', 'all' )
                     // Replace CRLF and LF with just CR

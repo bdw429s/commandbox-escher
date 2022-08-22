@@ -2,7 +2,7 @@
  * I allow rendering of 1 or more nested widgets inside a vertical panel where each widget is to above or below the others.
  * I am more of a container widget and don't have any output other than my border.
  *
- * ╔════════════╗
+ * ╔═╡ label ╞══╗
  * ╠════════════╣
  * ╠════════════╣
  * ║            ║
@@ -10,7 +10,7 @@
  *
  * TODO: make border customizable or be able to turn off completely
  */
-component extends='escher.models.AbstractWidget' {
+component extends='escher.models.AbstractWidget' accessors=true {
     //  Array of panes to display.  Each item contains struct with widget CFC instance, requestedHeight, actualHeight
     property name="panes" type="array";
 
@@ -125,7 +125,7 @@ component extends='escher.models.AbstractWidget' {
         // Top border line
         var paneLabel = panes.first().widget.getLabel();
         if( len( paneLabel ) ) {
-            finalLines.append( box.ul & box.h & box.h & ' ' & paneLabel & ' ' & repeatString( box.h, width+2-attr.stripAnsi( paneLabel ).length()-4 ) & box.ur )
+            finalLines.append( box.ul & box.h & box.llb & ' ' & paneLabel & ' '& box.lrb & repeatString( box.h, width+2-attr.stripAnsi( paneLabel ).length()-5 ) & box.ur )
         } else {
             finalLines.append( box.ul & repeatString( box.h, width+2 ) & box.ur )
         }
@@ -159,7 +159,7 @@ component extends='escher.models.AbstractWidget' {
             if( paneNo < panes.len() ) {
                 var paneLabel = panes[paneNo+1].widget.getLabel();
                 if( len( paneLabel ) ) {
-                    finalLines.append( box.hl & box.h & box.h & ' ' & paneLabel & ' ' & repeatString( box.h, width+2-attr.stripAnsi( paneLabel ).length()-4 ) & box.hr )
+                    finalLines.append( box.hl & box.h & box.llb & ' ' & paneLabel & ' ' & box.lrb & repeatString( box.h, width+2-attr.stripAnsi( paneLabel ).length()-5 ) & box.hr )
                 } else {
                     finalLines.append( box.hl & repeatString( box.h, width+2 ) & box.hr )
                 }

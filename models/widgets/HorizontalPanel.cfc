@@ -2,9 +2,9 @@
  * I allow rendering of 1 or more nested widgets inside a horizontal panel where each widget is to the left or right of the others.
  * I am more of a container widget and don't have any output other than my border.
  *
- * ╔══════╦═══╦═════════╗
- * ║      ║   ║         ║
- * ╚══════╩═══╩═════════╝
+ * ╔═╡ label ╞═╦═══╦═╡ label ╞═╗
+ * ║           ║   ║           ║
+ * ╚═══════════╩═══╩═══════════╝
  *
  * TODO: make border customizable or be able to turn off completely
  */
@@ -131,7 +131,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
             var pane = panes[ paneNo ];
             var paneLabel = pane.widget.getLabel();
             if( len( paneLabel ) ) {
-                topRow &= box.h & box.h & ' ' & paneLabel & ' ' & repeatString( box.h, pane.actualWidth-attr.stripAnsi( paneLabel ).length()-4 )
+                topRow &= box.h & box.llb & ' ' & paneLabel & ' ' & box.lrb & repeatString( box.h, pane.actualWidth-attr.stripAnsi( paneLabel ).length()-5 )
             } else {
                 topRow &= repeatString( box.h, pane.actualWidth )
             }
