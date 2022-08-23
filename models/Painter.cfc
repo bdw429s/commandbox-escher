@@ -47,7 +47,7 @@ component singleton accessors=true {
 				if( !getActive() ) {
 					setFuture(
 						getTaskScheduler().newSchedule( ()=>paint() )
-					        .every( 200 )
+					        .every( 350 )
 					        .start()
 					);
 
