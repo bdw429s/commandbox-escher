@@ -40,7 +40,6 @@ component implements='escher.models.IDrawable' accessors=true {
 		shs : '█', // Shadow side
         shb : '▀', // Shadow bottom
         shls : '▄' // Shadow lower side
-
     };
 
 	function onDIComplete() {
@@ -57,7 +56,7 @@ component implements='escher.models.IDrawable' accessors=true {
     /**
      * @Returns Gets widget lines in a thread safe manner
      * The array of lines will be duplicated so any changes myst
-     * be set back via setLines() 
+     * be set back via setLines()
      */
     array function getLines() {
         lock name='widget-lines-#UUID#' type='readOnly' {
@@ -172,7 +171,10 @@ component implements='escher.models.IDrawable' accessors=true {
                         process();
                     } catch( any e ) {
                         if( !e.message contains 'interrupt' ) {
-                            setLines( [ 'widget error: #e.message# #e.detail#' ] )
+                            setLines( [
+                                'widget error: #e.message# #e.detail#',
+                                '#e.tagContext[1].template#:#e.tagContext[1].line#'
+                            ] )
                         }
                     }
                 } )
@@ -217,5 +219,151 @@ component implements='escher.models.IDrawable' accessors=true {
      */
     string function getLabel() {
         return variables.label;
+    }
+
+    array function drawBox(
+        required height,
+        required width,
+        border=true,
+        borderColor='',
+        backgroundColor='',
+        shadow=true,
+        label='',
+        labelPosition='center'
+    ){
+        var box = duplicate = variables.box;
+        if( !border ) {
+            box.append(
+                {
+                    h : ' ',
+                    v : ' ',
+                    ul : ' ',
+                    ur : ' ',
+                    bl : ' ',
+                    br : ' ',
+                    hl : ' ',
+                    hr : ' ',
+                    vt : ' ',
+                    vb : ' ',
+                    llb : ' ',
+                    lrb : ' '
+                }
+            )
+        }
+
+        var color='#borderColor#on#backgroundColor#';
+        var lines = [];
+
+        if( !shadow ) {
+            width++;
+        }
+
+        if( width <= 7 ) {
+            label = '';
+        }
+        if( len( label ) ) {
+            var aLabel = attr.fromAnsi( label );
+            var labelLen = aLabel.length()+4;
+
+            if( labelLen > width-3 ) {
+                aLabel = aLabel.subSequence( 0, (width-3-4) );
+                label = aLabel.toString();
+                labelLen = aLabel.length()+4;
+            }
+
+            if( labelPosition == 'left' ) {
+                var headerStartCol = 0;
+                var headerEndWidth = width-2-headerStartCol - labelLen;
+            } else if( labelPosition == 'right' ) {
+                var headerStartCol = width-3-labelLen;
+                var headerEndWidth = 0;
+            } else {
+                var headerStartCol = int((width-3-labelLen)/2);
+                var headerEndWidth = width-3-headerStartCol - labelLen;
+            }
+
+            lines.append( print.t( box.ul & repeatString( box.h, headerStartCol ) & box.llb, color ) & print.t( ' ' & label, 'on#backgroundColor#' ) & print.t( ' ', 'on#backgroundColor#' ) & print.t( box.lrb & repeatString( box.h, headerEndWidth ) & box.ur, color ) );
+        } else {
+            lines.append( print.t( box.ul & repeatString( box.h, width-3 ) & box.ur, color ) );
+        }
+        loop times=( shadow ? height-3 : height-2 ) {
+            lines.append( print.t( box.v & repeatString( ' ', width-3 ) & box.v, color ) & ( shadow ? print.grey( box.shs ) : '' ) );
+        }
+        lines.append( print.t( box.bl & repeatString( box.h, width-3 ) & box.br, color ) & ( shadow ? print.grey( box.shs ) : '' ) );
+        if( shadow ) {
+            lines.append( ' ' & print.grey( repeatString( box.shb, width-1 ) ) );
+        }
+
+        return lines;
+
+
+    }
+
+    array function drawButton(
+        textColor='white',
+        backgroundColor='blue',
+        shadow,
+        label='',
+        hotKey='',
+        selected=false
+    ){
+        var color='#( selected ? 'reversed': '' )##textColor#on#backgroundColor#';
+        arguments.shadow = arguments.shadow ?: arguments.selected;
+        var lines = [];
+
+        if( len( Hotkey ) && find( hotKey, label ) ) {
+            var findPos = find( hotKey, label );
+            var label1=mid( label, 1, findPos-1 );
+            var label2=mid( label, findPos, 1 );
+            var label3=mid( label, findPos+1, len( label ) );
+        } else {
+            var label1=label;
+            var label2='';
+            var label3='';
+        }
+
+        lines.append( print.t( ' #label1#', color ) & print.underscored( label2, color ) & print.t( '#label3# ', color ) & ( shadow ? print.grey( box.shls ) : '' ) );
+        if( shadow ) {
+            lines.append( ' ' & print.grey( repeatString( box.shb, len( label )+2 ) ) );
+        }
+        return lines;
+
+    }
+
+    array function drawOverlay(
+        array outerLines,
+        array overlayLines,
+        numeric row,
+        numeric col,
+    ) {
+        if( isNull( arguments.row ) ) {
+            var midLine = int( outerLines.len()/2 );
+            var startLine = midLine - int( overLayLines.len()/2 );
+        } else {
+            var startLine = arguments.row;
+        }
+
+        if( isNull( arguments.col ) ) {
+            var thisLine = attr.fromAnsi( outerLines[startLine+1] );
+            var thisLineWidth = thisLine.length();
+            var overlayLine = attr.fromAnsi( overlayLines[1] );
+            var overlayLineWidth = overlayLine.length();
+            var overlayLineStart = int( thisLineWidth/2 )-int( overlayLineWidth/2 );
+        } else {
+            var overlayLineStart = arguments.col;
+        }
+
+
+        //setCursorPosition( overLayRender.cursorPosition.row+startLine, overLayRender.cursorPosition.col+overlayLineStart-1 )
+        var lineNo=0;
+        for( var overlayLine in overlayLines ) {
+            lineNo++;
+            var thisLine = attr.fromAnsi( outerLines[startLine+lineNo] );
+            var thisLineWidth = thisLine.length();
+            overlayLine = attr.fromAnsi( overlayLine );
+            var overlayLineWidth = overlayLine.length();
+            outerLines[startLine+lineNo] =  thisLine.subSequence( 0, overlayLineStart-1 ).toAnsi() & overlayLine.toAnsi() & thisLine.subSequence( overlayLineStart+overlayLineWidth-1, thisLineWidth ).toAnsi();
+        }
+        return outerLines;
     }
 }

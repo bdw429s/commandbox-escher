@@ -7,6 +7,9 @@ component {
 	*
 	*/
 	function run() {
+		getInstance( 'Painter@escher' ).start( getInstance( 'box@escher' ) );
+		return;
+
 		getInstance( 'Painter@escher' ).start( getInstance( 'time@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'weather@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'alert@escher' ).init( "The British are coming!", "error" ) );
@@ -14,7 +17,7 @@ component {
 		getInstance( 'Painter@escher' ).start( getInstance( 'textInput@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'scroller@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'chart@escher' ).init( 'My Chart' ) );
-		
+
 
 		getInstance( 'Painter@escher' ).start(
 			getInstance( 'OverlayPanel@escher' ).init(
