@@ -15,7 +15,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
             // Also, this array is never cleaned so it will grow forever, lol
             data.append( print.text( messages[ randRange(1,messages.len()) ], 'color#randRange(1,255)#' ) );
 
-            setLines( data );
+            setBuffer( data );
 
             sleep( 500 )
         }

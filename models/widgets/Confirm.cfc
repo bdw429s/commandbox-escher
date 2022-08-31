@@ -22,7 +22,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
             var messageEndWidth = 75-messageStartCol - getMessage().len();
             var yesFormat = '#response?'reversed':''#BoldWhiteOn#color#';
             var noFormat = '#!response?'reversed':''#WhiteOn#color#';
-            setLines( [
+            setBuffer( [
                 print.t( box.ul & repeatString( box.h, 75 ) & box.ur, color ),
                 print.t( box.v & repeatString( ' ', 75 ) & box.v, color ) & print.grey( box.shs ),
                 print.t( box.v, color ) & repeatString( ' ', messageStartCol )  & getMessage() & repeatString( ' ', messageEndWidth-1 )  & ' ' & print.t( box.v, color ) & print.grey( box.shs ),

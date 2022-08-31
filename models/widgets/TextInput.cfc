@@ -19,7 +19,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         while( isActive() ){
             setCursorPosition( 2, len( prompt )+cursorRow+2 )
             var maxLen = 73-getPrompt().len();
-            setLines( [
+            setBuffer( [
                 print.blue( box.ul & repeatString( box.h, 75 ) & box.ur ),
                 print.blue( box.v ) & ' ' & getPrompt() & print.boldBlackOnSilverBackground( inputText & repeatString( ' ', 73-len(getPrompt() & inputText) ) ) & ' ' & print.blue( box.v ) & print.grey( box.shs ),
                 print.blue( box.bl & repeatString( box.h, 75 ) & box.br ) & print.grey( box.shs ),

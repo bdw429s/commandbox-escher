@@ -39,7 +39,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
             var headerEndWidth = 75-headerStartCol - getType().len();
             var messageStartCol = int((66-len(getMessage()))/2);
             var messageEndWidth = 66-messageStartCol - getMessage().len();
-            setLines( [
+            setBuffer( [
                 print.t( box.ul & repeatString( box.h, headerStartCol ) & ' ' & getType() & ' ' & repeatString( box.h, headerEndWidth-2 ) & box.ur, color ),
                 print.t( box.v & repeatString( ' ', 75 ) & box.v, color ) & print.grey( box.shs ),
                 print.t( box.v, color ) & '     #icon#   ' & repeatString( ' ', messageStartCol )  & getMessage() & repeatString( ' ', messageEndWidth-1 )  & ' ' & print.t( box.v, color ) & print.grey( box.shs ),

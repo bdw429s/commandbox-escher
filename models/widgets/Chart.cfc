@@ -88,7 +88,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
                 theLines.append( repeatString( ' ', headerStartCol ) & getTitle() & repeatString( ' ', headerEndWidth ) )
             }
 
-            setLines( theLines.reverse() );
+            setBuffer( theLines.reverse() );
 
             return super.render( argumentCollection=arguments );
     }

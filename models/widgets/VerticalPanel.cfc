@@ -134,7 +134,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         for( var pane in panes ) {
             paneNo++;
             // Get the rendered content for the nested widget
-            var paneLines = pane.widget.render( pane.actualHeight, width ).lines;
+            var paneLines = pane.widget.render( pane.actualHeight, width ).buffer;
             finalLines.append(
                 paneLines
                     // for each line
@@ -168,7 +168,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         // Bottom border line
         finalLines.append( box.bl & repeatString( box.h, width+2 ) & box.br )
 
-        setLines( finalLines );
+        setBuffer( finalLines );
         // Let abstract class clean up data (truncate) and convert strings to AttributedStrings, as well as create final render output struct.
         return super.render( originalHeight, originalWidth );
     }

@@ -7,7 +7,21 @@ component {
 	*
 	*/
 	function run() {
-		getInstance( 'Painter@escher' ).start( getInstance( 'box@escher' ) );
+		getInstance( 'Painter@escher' ).start( getInstance( 'Dialog@escher' ).init(
+			message : "This is some text which will be nicely wrapped.  The dialog will stretch to fit.",
+			label : "Hey, you!",
+			buttons : [
+				{
+                    label : 'Confirm',
+                    hotKey='C',
+                    selected=true,
+				},
+				{
+                    label : 'Cancel',
+                    hotKey='n'
+				}
+			]
+		 ) );
 		return;
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'time@escher' ) );

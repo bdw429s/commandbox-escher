@@ -11,7 +11,8 @@ component implements='escher.models.IDrawable' accessors=true {
     // If null, it means the widget does not require the cursor to be anywhere on screen and it will not be sent back from render()
     property name="cursorPosition" type="struct";
     // Array of "lines" of text representing the output of this widget
-    property name="lines" type="array";
+    property name="buffer" type="array";
+    property name="backBuffer" type="array";
     property name="active" type="boolean" default=false;
 	property name='taskScheduler';
 	property name='future';
@@ -20,7 +21,8 @@ component implements='escher.models.IDrawable' accessors=true {
 
 	processingdirective pageEncoding='UTF-8';
 
-    variables.lines = [];
+    variables.buffer = [];
+    variables.backBuffer = [];
     // Re-usable Java proxy for creating attributed strings
 	variables.attr = createObject( 'java', 'org.jline.utils.AttributedString' );
     // Helper with border chars for box drawing
@@ -54,23 +56,39 @@ component implements='escher.models.IDrawable' accessors=true {
     }
 
     /**
-     * @Returns Gets widget lines in a thread safe manner
-     * The array of lines will be duplicated so any changes myst
-     * be set back via setLines()
+     * @Returns Gets widget back buffer
      */
-    array function getLines() {
-        lock name='widget-lines-#UUID#' type='readOnly' {
-           return duplicate(  variables.lines );
+    array function getBuffer() {
+        return variables.backBuffer;
+    }
+
+    /**
+     * @Returns Gets widget committed buffer in a thread safe manner
+     * The array of lines will be duplicated so any changes myst
+     * be set back via setBuffer()
+     */
+    array function getCommittedBuffer() {
+        lock name='widget-buffer-#UUID#' type='readOnly' {
+           return duplicate(  variables.buffer );
         }
     }
 
     /**
-     * @Returns Sets widget lines in a thread safe manner
+     * @Returns Commits widget back buffer into the front buffer in a thread safe manner
      */
-    function setLines( required array newLines ) {
-        lock name='widget-lines-#UUID#' type='exclusive' {
-           variables.lines = newLines;
+    function commitBuffer() {
+        lock name='widget-buffer-#UUID#' type='exclusive' {
+           variables.buffer = variables.backBuffer;
         }
+        return this;
+    }
+
+    /**
+     * @Returns Clears widget back buffer
+     */
+    function clearBuffer() {
+        variables.backBuffer=[];
+        return this;
     }
 
     /**
@@ -80,13 +98,13 @@ component implements='escher.models.IDrawable' accessors=true {
      * @width max width of renderable space
      *
      * @Returns struct with following keys:
-     * - lines - contains array of strings representing output
+     * - buffer - contains array of strings representing output
      * - cursorPosition - contains struct with row/col keys representing row/col of cursor starting from upper left
      */
     struct function render( required numeric height, required numeric width ) {
 
         var data = {
-            lines : getLines()
+            buffer : getCommittedBuffer()
                 // Replace tabs with spaces
                 .map( (l)=>replace( l, chr(9), '    ', 'all' )
                     // Replace CRLF and LF with just CR
@@ -112,7 +130,7 @@ component implements='escher.models.IDrawable' accessors=true {
         }
 
         // Trim lines too long.  We could throw an error, but for now we just truncate
-        data.lines = data.lines.map( (l) => {
+        data.buffer = data.buffer.map( (l) => {
             // toString() is important as AttributedString's constructor doesn't like "simple values" like dates
             if( attr.stripAnsi( toString( l ) ).length() > width ) {
                 return attr.fromAnsi( toString( l ) ).subSequence( 0, width ).toString();
@@ -123,8 +141,8 @@ component implements='escher.models.IDrawable' accessors=true {
 
         // Trim to terminal height so the screen doesn't go all jumpy
         // If there is more output than screen, the user just doesn't get to see the rest
-        if( lines.len() > height ) {
-            data.lines = data.lines.slice( lines.len()-height, lines.len()-(lines.len()-height) );
+        if( data.buffer.len() > height ) {
+            data.buffer = data.buffer.slice( data.buffer.len()-height, data.buffer.len()-(data.buffer.len()-height) );
         }
 
         return data;
@@ -171,9 +189,9 @@ component implements='escher.models.IDrawable' accessors=true {
                         process();
                     } catch( any e ) {
                         if( !e.message contains 'interrupt' ) {
-                            setLines( [
+                            setBuffer( [
                                 'widget error: #e.message# #e.detail#',
-                                '#e.tagContext[1].template#:#e.tagContext[1].line#'
+                                (e.tagContext.len() ? '#e.tagContext[1].template#:#e.tagContext[1].line#' : '' )
                             ] )
                         }
                     }
@@ -221,7 +239,7 @@ component implements='escher.models.IDrawable' accessors=true {
         return variables.label;
     }
 
-    array function drawBox(
+    function drawBox(
         required height,
         required width,
         border=true,
@@ -252,7 +270,6 @@ component implements='escher.models.IDrawable' accessors=true {
         }
 
         var color='#borderColor#on#backgroundColor#';
-        var lines = [];
 
         if( !shadow ) {
             width++;
@@ -282,30 +299,32 @@ component implements='escher.models.IDrawable' accessors=true {
                 var headerEndWidth = width-3-headerStartCol - labelLen;
             }
 
-            lines.append( print.t( box.ul & repeatString( box.h, headerStartCol ) & box.llb, color ) & print.t( ' ' & label, 'on#backgroundColor#' ) & print.t( ' ', 'on#backgroundColor#' ) & print.t( box.lrb & repeatString( box.h, headerEndWidth ) & box.ur, color ) );
+            backBuffer.append( print.t( box.ul & repeatString( box.h, headerStartCol ) & box.llb, color ) & print.t( ' ' & label, 'on#backgroundColor#' ) & print.t( ' ', 'on#backgroundColor#' ) & print.t( box.lrb & repeatString( box.h, headerEndWidth ) & box.ur, color ) );
         } else {
-            lines.append( print.t( box.ul & repeatString( box.h, width-3 ) & box.ur, color ) );
+            backBuffer.append( print.t( box.ul & repeatString( box.h, width-3 ) & box.ur, color ) );
         }
         loop times=( shadow ? height-3 : height-2 ) {
-            lines.append( print.t( box.v & repeatString( ' ', width-3 ) & box.v, color ) & ( shadow ? print.grey( box.shs ) : '' ) );
+            backBuffer.append( print.t( box.v & repeatString( ' ', width-3 ) & box.v, color ) & ( shadow ? print.grey( box.shs ) : '' ) );
         }
-        lines.append( print.t( box.bl & repeatString( box.h, width-3 ) & box.br, color ) & ( shadow ? print.grey( box.shs ) : '' ) );
+        backBuffer.append( print.t( box.bl & repeatString( box.h, width-3 ) & box.br, color ) & ( shadow ? print.grey( box.shs ) : '' ) );
         if( shadow ) {
-            lines.append( ' ' & print.grey( repeatString( box.shb, width-1 ) ) );
+            backBuffer.append( ' ' & print.grey( repeatString( box.shb, width-1 ) ) );
         }
 
-        return lines;
+        return this;
 
 
     }
 
-    array function drawButton(
+    function drawButton(
         textColor='white',
         backgroundColor='blue',
         shadow,
         label='',
         hotKey='',
-        selected=false
+        selected=false,
+        numeric row,
+        numeric col
     ){
         var color='#( selected ? 'reversed': '' )##textColor#on#backgroundColor#';
         arguments.shadow = arguments.shadow ?: arguments.selected;
@@ -326,16 +345,29 @@ component implements='escher.models.IDrawable' accessors=true {
         if( shadow ) {
             lines.append( ' ' & print.grey( repeatString( box.shb, len( label )+2 ) ) );
         }
-        return lines;
+        return drawOverlay(
+            lines,
+            row,
+            col
+        );
 
     }
 
-    array function drawOverlay(
-        array outerLines,
+    function drawOverlay(
         array overlayLines,
         numeric row,
-        numeric col,
+        numeric col
     ) {
+
+        if( row < 1 ) {
+            row = 1;
+        }
+        if( col < 1 ) {
+            col = 1;
+        }
+        // TODO: Allow overlayLines to be array, strut, or iDrawable
+
+        var outerLines = getBuffer();
         if( isNull( arguments.row ) ) {
             var midLine = int( outerLines.len()/2 );
             var startLine = midLine - int( overLayLines.len()/2 );
@@ -344,7 +376,7 @@ component implements='escher.models.IDrawable' accessors=true {
         }
 
         if( isNull( arguments.col ) ) {
-            var thisLine = attr.fromAnsi( outerLines[startLine+1] );
+            var thisLine = attr.fromAnsi( outerLines[startLine] );
             var thisLineWidth = thisLine.length();
             var overlayLine = attr.fromAnsi( overlayLines[1] );
             var overlayLineWidth = overlayLine.length();
@@ -358,12 +390,117 @@ component implements='escher.models.IDrawable' accessors=true {
         var lineNo=0;
         for( var overlayLine in overlayLines ) {
             lineNo++;
-            var thisLine = attr.fromAnsi( outerLines[startLine+lineNo] );
+            outerLineNo=startLine+lineNo-1;
+            while( outerLines.len() < outerLineNo ) {
+                outerLines.append( '' );
+            }
+            var thisLine = attr.fromAnsi( outerLines[outerLineNo] );
             var thisLineWidth = thisLine.length();
             overlayLine = attr.fromAnsi( overlayLine );
             var overlayLineWidth = overlayLine.length();
-            outerLines[startLine+lineNo] =  thisLine.subSequence( 0, overlayLineStart-1 ).toAnsi() & overlayLine.toAnsi() & thisLine.subSequence( overlayLineStart+overlayLineWidth-1, thisLineWidth ).toAnsi();
+            // If the overlay starts inside the current line, take the substring prior
+            if( overlayLineStart <= thisLineWidth ) {
+                outerLines[outerLineNo] = thisLine.subSequence( 0, overlayLineStart-1 ).toAnsi();
+            // Otherise, take the full line and pad spaces
+            } else {
+                outerLines[outerLineNo] = thisLine.toAnsi() & repeatString( ' ', overlayLineStart - thisLineWidth - 1 );
+            }
+            // Add in the overlay
+            outerLines[outerLineNo] &= overlayLine.toAnsi();
+            // If the overlay ednds inside the current line, take the substring after
+
+            if( overlayLineStart+overlayLineWidth <= thisLineWidth ) {
+                outerLines[outerLineNo] &= thisLine.subSequence( overlayLineStart+overlayLineWidth-1, thisLineWidth ).toAnsi();
+            }
+
         }
-        return outerLines;
+        return this;
+    }
+
+    /**
+     * Helps display and format blocks of text
+     *
+     * @text A string with possible line breaks or an array of lines.  Any lines in the array with line breaks will be turned into multiple lines
+     * @height Number of rows to fit text inside of.  Value of -1 disables vertical control strategy, displaying all input lines.
+     * @width Number of columns to fix text inside of
+     * @horizontalStrategy How to deal with lines of text wider than the supplied width (wrap,truncate,wordWrap)
+     * @verticalStrategy How to deal with lines of text after the supplied height (truncateTop,truncateBottom)
+     */
+    array function textControl(
+        required any text,
+        required numeric height=-1,
+        required numeric width,
+        horizontalStrategy='truncate',
+        verticalStrategy='truncateBottom'
+    ) {
+        if( isSimpleValue( text ) ) {
+            text = [ text ];
+        }
+
+        // Helper function for wrapping a single line of text
+        var appendLine = ( result, thisLine ) => {
+            // As long as our string is too long, keep cutting it down
+            while( thisLine.length() > width ) {
+                // If we are truncating, it's a one-and-done.  (appended below)
+                if( horizontalStrategy == 'truncate' ) {
+                    thisLine = thisLine.subSequence( 0, width );
+                // Basic wrap just cuts at the exact width
+                } else if( horizontalStrategy == 'wrap' ) {
+                    result.append( thisLine.subSequence( 0, width ).toAnsi() );
+                    thisLine = thisLine.subSequence( width, thisLine.length() );
+                // Word wrap looks for a word boundary to cut at
+                } else if( horizontalStrategy == 'wordWrap' ) {
+                    var end = width;
+                    // Back up until we find a space or the start of the string
+                    while( end > width/2 && thisLine.subSequence( end, end+1 ).toAnsi() != ' ' ) {
+                        end--;
+                    }
+                    // We couldn't find a word boundary.
+                    if( end <= width/2 ) {
+                        end = width;
+                    }
+                    result.append( thisLine.subSequence( 0, end ).toAnsi() );
+                    thisLine = thisLine.subSequence( end+1, thisLine.length() );
+                } else {
+                    throw( 'Invalid horizontalStrategy [#horizontalStrategy#].  Valid options are truncate, wrap, or wordWrap' )
+                }
+            }
+            // This isa ny left over
+            result.append( thisLine.toAnsi() );
+        };
+
+        text = text
+           // Replace tabs with spaces
+            .map( (l)=>replace( l, chr(9), '    ', 'all' )
+            // Replace CRLF and LF with just CR
+            .replace( chr(13) & chr(10), chr(10), 'all' )
+            .replace( chr(13), chr(10), 'all' ) )
+            .reduce( function( result, i ) {
+                // Break our ANSI string up on line breaks
+                var as = attr.fromAnsi( toString( i ) );
+                var ps = attr.stripAnsi( toString( i ) );
+                var currPos = 1;
+                while( var breakPosition = ps.reFind( '\n', currPos ) ) {
+                    var thisLine = as.subSequence( currPos-1, breakPosition-1 );
+                    currPos=breakPosition+1;
+                    appendLine( result, thisLine );
+                }
+
+                appendLine( result, as.subSequence( currPos-1, ps.length() ) );
+                return result;
+            }, [] )
+
+        // Deal with more lines than we have height for
+        if( height > 0 && text.len() > height ) {
+            if( verticalStrategy == 'truncateTop' ) {
+                text = text.slice( text.len()-height, text.len()-(text.len()-height)+1 );
+            } else if( verticalStrategy == 'truncateBottom' ) {
+                text = text.slice( 1, height );
+            } else {
+                throw( 'Invalid verticalStrategy [#verticalStrategy#].  Valid options are truncateTop or truncateBottom' )
+            }
+        }
+
+        return text;
     }
 }

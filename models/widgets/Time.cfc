@@ -2,7 +2,7 @@
  * I ouptut the current date/time as ASCII arg
  * I am just a proof of concept.
  */
-component extends='escher.models.AbstractWidget' {
+component extends='escher.models.AbstractWidget' accessors=true {
     processingdirective pageEncoding='UTF-8';
 
     function process() {
@@ -11,7 +11,7 @@ component extends='escher.models.AbstractWidget' {
             var dateTime = dateTimeString.listtoArray( '' );
             setLabel( dateTimeString );
             // My ASCII art letters are 5 rows tall, so map the characters inour string to each of the rows below
-            setLines(
+            setBuffer(
                 [
                     dateTime.map( (c)=>rows[1][ rowMap[c] ] ).toList( '' ),
                     dateTime.map( (c)=>rows[2][ rowMap[c] ] ).toList( '' ),

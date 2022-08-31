@@ -95,7 +95,7 @@ component singleton accessors=true {
 	}
 
 	/**
-	* Draw the lines to the console
+	* Draw the buffer to the console
 	*
 	*/
 	function paint() {
@@ -110,7 +110,7 @@ component singleton accessors=true {
 			display.resize( height, width );
 
 			var renderedContent = getWidget().render( height-1, width );
-			var lines = renderedContent.lines
+			var buffer = renderedContent.buffer
 				.map( (l)=>attr.fromAnsi(l) );
 			var cursorPosInt = 0;
 			if( renderedContent.keyExists( 'cursorPosition' ) ) {
@@ -119,7 +119,7 @@ component singleton accessors=true {
 
 			// Add to console and flush
 			display.update(
-				lines,
+				buffer,
 				cursorPosInt
 			);
 

@@ -34,11 +34,11 @@ component extends='escher.models.AbstractWidget' accessors=true{
      * @width current width constraint
      */
     struct function render( required numeric height, required numeric width ) {
-        var theLines = pane.render( height, width ).lines;
+        var theLines = pane.render( height, width ).buffer;
 
         if( !isNull( overlay ) && overlay.isActive() ) {
             var overLayRender = overlay.render( height, width );
-            var overLayLines = overLayRender.lines;
+            var overLayLines = overLayRender.buffer;
 
             var midLine = int( theLines.len()/2 );
             var startLine = midLine - int( overLayLines.len()/2 );
@@ -62,7 +62,7 @@ component extends='escher.models.AbstractWidget' accessors=true{
         } else {
             setCursorPosition( 1, 1 )
         }
-        setLines( theLines )
+        setBuffer( theLines )
         return super.render( height, width );
     }
 

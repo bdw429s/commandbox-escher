@@ -3,7 +3,7 @@
  * I am just a proof of concept, perhaps make me extendable and have subclasses that provide my data.
  * Or perhaps we don't even need a sub clas, but rather pass a closure to produce the data so I can be more resuable
  */
-component extends='escher.models.AbstractWidget' {
+component extends='escher.models.AbstractWidget' accessors=true {
     processingdirective pageEncoding='UTF-8';
     property name="serverService" inject="serverService";
 
@@ -28,9 +28,9 @@ component extends='escher.models.AbstractWidget' {
                     return acc;
                 },[])
                 if( serverlist.len() ) {
-                    setLines([print.table(serverlist)])
+                    setBuffer([print.table(serverlist)])
                 } else {
-                    setLines(['There are no servers running'])
+                    setBuffer(['There are no servers running'])
                 }
 
             sleep(5000)

@@ -1,7 +1,7 @@
 component extends='escher.models.AbstractWidget' accessors=true {
     variables.location  = {};
 
-    setLines( [
+    setBuffer( [
         'Gathering weather data....'
     ] );
 
@@ -26,7 +26,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
             }
             data.append( 'Last updated #dateTimeFormat( now(), 'mm/dd/yyyy hh:nn:ss tt' )#' );
 
-            setLines( data );
+            setBuffer( data );
 
             // Update once per minute
             sleep( 60 * 1000 )

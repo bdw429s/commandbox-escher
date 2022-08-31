@@ -121,7 +121,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         // Now that we know the final widths availble to each pane, ask them each to render themselves.
         // Since this is a horizontal panel, their height is our height (minus the borders which we trimmed above)
         // Store each pane's rendered lines and we'll assemble them below one line at a time
-        panes.each( (pane)=>pane.lines=pane.widget.render( height, pane.actualWidth ).lines );
+        panes.each( (pane)=>pane.lines=pane.widget.render( height, pane.actualWidth ).buffer );
 
         var finalLines = [];
         // Let's do a pass over the panes to calulate thetop and bottom rows
@@ -180,7 +180,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         finalLines.prepend( topRow )
         finalLines.append( bottomRow )
 
-        setLines( finalLines );
+        setBuffer( finalLines );
         // Let abstract class clean up data (truncate) and convert strings to AttributedStrings, as well as create final render output struct.
         return super.render( originalHeight, originalWidth );
     }

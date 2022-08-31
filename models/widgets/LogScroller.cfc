@@ -13,7 +13,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
 
 		setLabel( listLast( variables.file.toString(), '/\' ) );
             var data = getTail(variables.file,7)
-            setLines( data );
+            setBuffer( data );
             sleep( 500 )
         }
     }
