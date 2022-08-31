@@ -13,21 +13,24 @@ component {
 			buttons : [
 				{
                     label : 'Confirm',
-                    hotKey='C',
-                    selected=true,
+                    hotKey : 'C',
+                    selected : true,
+					onSubmit : (dialog)=>print.line( 'Confirmed!' )
 				},
 				{
                     label : 'Cancel',
-                    hotKey='n'
+                    hotKey : 'n',
+					onSubmit : (dialog)=>print.line( 'Cancelled!' )
 				}
 			]
 		 ) );
+
+		getInstance( 'Painter@escher' ).start( getInstance( 'alert@escher' ).init( "The British are coming!", "error" ) );
+		getInstance( 'Painter@escher' ).start( getInstance( 'confirm@escher' ).init( "Release the robots? ", (response, dialog)=>print.line( 'You confirmed [#response#]' ) ) );
 		return;
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'time@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'weather@escher' ) );
-		getInstance( 'Painter@escher' ).start( getInstance( 'alert@escher' ).init( "The British are coming!", "error" ) );
-		getInstance( 'Painter@escher' ).start( getInstance( 'confirm@escher' ).init( "Release the robots? " ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'textInput@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'scroller@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'chart@escher' ).init( 'My Chart' ) );

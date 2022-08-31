@@ -425,18 +425,27 @@ component implements='escher.models.IDrawable' accessors=true {
      * @width Number of columns to fix text inside of
      * @horizontalStrategy How to deal with lines of text wider than the supplied width (wrap,truncate,wordWrap)
      * @verticalStrategy How to deal with lines of text after the supplied height (truncateTop,truncateBottom)
+     * @textAlign How to align text within the width given (left,center)
      */
     array function textControl(
         required any text,
         required numeric height=-1,
         required numeric width,
         horizontalStrategy='truncate',
-        verticalStrategy='truncateBottom'
+        verticalStrategy='truncateBottom',
+        textAlign='left'
     ) {
         if( isSimpleValue( text ) ) {
             text = [ text ];
         }
-
+        var alignText = ( as ) => {
+            if( textAlign == 'center' && as.length() < width ) {
+                var padding = attr.init( repeatString( ' ', int( (width-as.length())/2 ) ) );
+                return attr.join( attr.fromAnsi(''), [ padding, as, padding ] );
+            } else {
+                return as;
+            }
+        };
         // Helper function for wrapping a single line of text
         var appendLine = ( result, thisLine ) => {
             // As long as our string is too long, keep cutting it down
@@ -446,7 +455,7 @@ component implements='escher.models.IDrawable' accessors=true {
                     thisLine = thisLine.subSequence( 0, width );
                 // Basic wrap just cuts at the exact width
                 } else if( horizontalStrategy == 'wrap' ) {
-                    result.append( thisLine.subSequence( 0, width ).toAnsi() );
+                    result.append(  alignText( thisLine.subSequence( 0, width ) ).toAnsi() );
                     thisLine = thisLine.subSequence( width, thisLine.length() );
                 // Word wrap looks for a word boundary to cut at
                 } else if( horizontalStrategy == 'wordWrap' ) {
@@ -459,14 +468,14 @@ component implements='escher.models.IDrawable' accessors=true {
                     if( end <= width/2 ) {
                         end = width;
                     }
-                    result.append( thisLine.subSequence( 0, end ).toAnsi() );
+                    result.append(  alignText( thisLine.subSequence( 0, end ) ).toAnsi() );
                     thisLine = thisLine.subSequence( end+1, thisLine.length() );
                 } else {
                     throw( 'Invalid horizontalStrategy [#horizontalStrategy#].  Valid options are truncate, wrap, or wordWrap' )
                 }
             }
             // This isa ny left over
-            result.append( thisLine.toAnsi() );
+            result.append(  alignText( thisLine ).toAnsi() );
         };
 
         text = text
