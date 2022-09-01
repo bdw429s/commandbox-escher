@@ -9,6 +9,25 @@ component {
 	function run() {
 
 
+		getInstance( 'Painter@escher' ).start(
+			getInstance( 'HorizontalPanel@escher' )
+				.addPane( getInstance( 'VerticalPanel@escher' )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
+				)
+				.addPane( getInstance( 'VerticalPanel@escher' )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Password: ' ) )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Company: ' ) )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Foobar: ' ) )
+				)
+
+
+		);
+
+		return;
+
+
 		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( 'Enter Passphrase: ', (r)=>print.line( r ) ) );
 		//return;
 
@@ -51,11 +70,16 @@ component {
 					'75%'
 				 )
 				.addPane( getInstance( 'VerticalPanel@escher' )
-					.addPane( getInstance( 'Scroller@escher' ) )
-					.addPane( getInstance( 'Scroller@escher' ) )
-					.setLabel( 'Log Files' )
-				),
-				getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
+					.addPane( getInstance( 'Scroller@escher' ), '50%' )
+					.addPane( getInstance( 'VerticalPanel@escher' ).init( { border : false } )
+						.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
+						.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
+						.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
+						.addPane( getInstance( 'TextInput@escher' ).init( 'Password: ' ) )
+					 )
+					 .setLabel( 'Log Files' )
+				)//,
+				//getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
 			)
 		);
 		print.greenLine( 'Complete!' );

@@ -9,13 +9,23 @@
  * TODO: make border customizable or be able to turn off completely
  */
 component extends='escher.models.AbstractWidget' accessors=true {
+    property name='boxOptions' type='struct';
 
     /**
      * Allow children to be added via constructor, HOWEVER ther is no way to pass width in this case
-    * HorizontalPanel.init( widget1, widget2, widget3 )
+    *
     * So they will all be auto-scaling
     */
-    function init() {
+    function init( struct boxOptions={} ) {
+        setBoxOptions( boxOptions );
+        return this;
+    }
+
+    /**
+     * Add more than one page, all auto-scaling
+     * Panel.addPanes( widget1, widget2, widget3 )
+     */
+    function addPanes() {
         arguments.each( (k,v)=>addPane(v) );
         return this;
     }
@@ -48,6 +58,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
      * @width current width constraint
      */
     struct function render( required numeric height, required numeric width ) {
+        setCursorPosition( -1, -1 )
 
         // I need this to pass to super.render() below.
         var originalHeight = height;
@@ -93,18 +104,18 @@ component extends='escher.models.AbstractWidget' accessors=true {
             if( remainingCols > 0 ) {
                 // All remaining children with width of -1 equally spread out over remaining space
                 // First, how many stretch children are sharing the remaining columns?
-                var numStrectchChildren = children.reduce( (acc,p)=>{
+                var numStretchChildren = children.reduce( (acc,p)=>{
                     if( p.requestedWidth == -1 ) {
                         return acc+1;
                     }
                     return acc;
                 }, 0 );
                 var colsAvailbleForStretch = remainingCols;
-                if( numStrectchChildren ) {
+                if( numStretchChildren ) {
                     children.each( (p)=>{
                         if( p.requestedWidth == -1 ) {
                             // Actual width is equal percentage of remaining columns (round down)
-                            p.actualWidth = int( colsAvailbleForStretch/numStrectchChildren );
+                            p.actualWidth = int( colsAvailbleForStretch/numStretchChildren );
                             remainingCols -= p.actualWidth;
                         }
                     } );
@@ -120,7 +131,22 @@ component extends='escher.models.AbstractWidget' accessors=true {
         // Now that we know the final widths availble to each pane, ask them each to render themselves.
         // Since this is a horizontal panel, their height is our height (minus the borders which we trimmed above)
         // Store each pane's rendered lines and we'll assemble them below one line at a time
-        children.each( (pane)=>pane.lines=pane.widget.render( height, pane.actualWidth ).buffer );
+
+
+
+
+
+        children.each( (pane)=>{
+            // Get the rendered content for the nested widget
+            var paneRendering = pane.widget.render( height, pane.actualWidth );
+            pane.lines=paneRendering.buffer
+
+            if( !isNull( paneRendering.cursorPosition ) ) {
+                pane.cursorPosition=paneRendering.cursorPosition;
+            } else {
+                pane.delete( 'cursorPosition' );
+            }
+        } );
 
         var finalLines = [];
         // Let's do a pass over the children to calulate thetop and bottom rows
@@ -143,7 +169,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
                 bottomRow &= box.h & box.vb & box.h;
             }
         }
-        // Finish off top and bottom rows.  We'll append/prepent them later
+        // Finish off top and bottom rows.  We'll append/prepend them later
         topRow &= box.h & box.ur;
         bottomRow &= box.h & box.br;
 
@@ -153,6 +179,12 @@ component extends='escher.models.AbstractWidget' accessors=true {
             // Now, grab the current line from each pane to assemble
             loop from=1 to=children.len() index="local.paneNo" {
                 var pane = children[ paneNo ];
+
+                // On the first row, check the cursor positioning for each pane
+                if( row == 1 && !isNull( pane.cursorPosition ) ) {
+                    setCursorPosition( pane.cursorPosition.row+1, pane.cursorPosition.col+attr.fromAnsi(thisRow).length() )
+                }
+
                 // If our pane has content for this row, use it (the pane may not have rendered all the rows available)
                 if( row <= pane.lines.len() ) {
                     thisRow &= pane.lines[ row ];

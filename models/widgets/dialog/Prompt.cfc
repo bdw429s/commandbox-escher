@@ -15,7 +15,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         registerListener( 'onKey', (data)=>{
             if( asc( data.key ) == 13 || asc( data.key ) == 10 ) {
                 if( !isNull( getOnSubmit() ) ) {
-                    getOnSubmit()( children[1].widget.getValue() );
+                    getOnSubmit()( children[1].widget.getInputValue() );
                 }
                 stop();
             }

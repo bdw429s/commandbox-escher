@@ -2,25 +2,34 @@
  * I collect a line of text from the user.  Press enter to submit.
  */
 component extends='escher.models.AbstractWidget' accessors=true {
-    property name='value' type='string' default='';
+    property name='inputValue' type='string' default='';
+    property name='inputLabel' type='string';
+    property name='inputName' type='string';
     property name='cursorRow' type='numeric' default='1';
     property name='maxLength' type='numeric';
 
-    function init( string label='Input Here: ', maxLength=50 ) {
-        setLabel( label );
+    function init( string inputLabel='Input Here: ',string inputName='Input Here: ', maxLength=50 ) {
+        setInputLabel( inputLabel );
         setMaxLength( maxLength );
-        registerListener( 'onKey', (data)=>doKey( data.key ) );
-        setCursorPosition( 1, len( label )+cursorRow )
         return this;
+    }
+
+    function onFocus() {
+        setCursorPosition( 1, len( inputLabel )+cursorRow )
+        registerListener( 'onKey', (data)=>doKey( data.key ) );
+    }
+
+    function onBlur() {
+        removeListener( 'onKey' );
+        setCursorPosition( -1, -1 )
     }
 
     struct function render( required numeric height, required numeric width ) {
         // TODO: allow text to sroll inside of control
         maxLength = min( maxLength, width );
         setBuffer( [
-            getLabel() & print.boldBlackOnSilverBackground( value & repeatString( ' ', (min(maxLength,width)-len(getLabel() & value) ) ) )
+            getInputLabel() & print.boldBlackOnSilverBackground( inputValue & repeatString( ' ', (min(maxLength,width)-len(getInputLabel() & inputValue) ) ) )
         ] );
-        setCursorPosition( 1, len( label )+cursorRow )
 
         return super.render( height, width );
     }
@@ -33,17 +42,17 @@ component extends='escher.models.AbstractWidget' accessors=true {
                     if( cursorRow > 1 ) cursorRow--;
                     break;
                 case 'key_right':
-                if( cursorRow <= len( value ) ) cursorRow++;
+                if( cursorRow <= len( inputValue ) ) cursorRow++;
                     break;
                 case 'key_home':
                     cursorRow=1;
                     break;
                 case 'key_end':
-                    cursorRow=len( value )+1;
+                    cursorRow=len( inputValue )+1;
                     break;
                 case 'key_dc':
-                    if( cursorRow<=len(value) ) {
-                        value = value.mid( 1,cursorRow-1 ) & value.mid(cursorRow+1, len(value))
+                    if( cursorRow<=len(inputValue) ) {
+                        inputValue = inputValue.mid( 1,cursorRow-1 ) & inputValue.mid(cursorRow+1, len(inputValue))
                     }
 
                 break;
@@ -57,17 +66,17 @@ component extends='escher.models.AbstractWidget' accessors=true {
             switch( asc( key ) ) {
                 // backspace
                 case 8:
-                    if(cursorRow==len(value)+1) {
+                    if(cursorRow==len(inputValue)+1) {
                         if( cursorRow > 2 ) {
-                            value = value.left(-1);
+                            inputValue = inputValue.left(-1);
                             cursorRow--;
                         } else if( cursorRow==2 ) {
-                            value='';
+                            inputValue='';
                             cursorRow--;
                         }
                     } else {
                         if( cursorRow > 1 ){
-                            value = value.mid( 1,cursorRow-2 ) & value.mid(cursorRow, len(value))
+                            inputValue = inputValue.mid( 1,cursorRow-2 ) & inputValue.mid(cursorRow, len(inputValue))
                             cursorRow--;
                         }
                     }
@@ -80,18 +89,18 @@ component extends='escher.models.AbstractWidget' accessors=true {
                     // nothing
                     break;
                 default:
-                    if( value.len() >= maxLength ) break;
+                    if( inputValue.len() >= maxLength ) break;
 
-                    if(cursorRow==len(value)+1) {
-                        value &= key;
+                    if(cursorRow==len(inputValue)+1) {
+                        inputValue &= key;
                     } else {
-                        value = value.mid( 1,cursorRow-1 ) & key & value.mid(cursorRow, len(value))
+                        inputValue = inputValue.mid( 1,cursorRow-1 ) & key & inputValue.mid(cursorRow, len(inputValue))
                     }
                     cursorRow++;
             }
         }
 
-        setCursorPosition( 1, len( label )+cursorRow )
+        setCursorPosition( 1, len( inputLabel )+cursorRow )
     }
 
 }

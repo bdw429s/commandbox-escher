@@ -58,12 +58,35 @@ component singleton accessors=true {
 								setting requestTimeout=999999999;
 								while( getWidget().isActive() ) {
 									var key = shell.waitForKey();
-									widget.emit( event='onKey', data={ key : key } )
+
+									if( key == 'back_tab' ) {
+										widget.emit( event='retractFocus', data : { success : false } );
+									} else if( asc(key) == 9 ) {
+										widget.emit( event='advanceFocus', data : { success : false } );
+									} else {
+										// Widgets will never see a tab/shift-tab emitted to them directly
+										widget.emit( event='onKey', data={ key : key } );
+									}
+
 								}
 							} catch( any e ) {
 								if( !(e.type contains 'interrupt' || e.message contains 'interrupt' ) ) {
 									systemoutput( e.message & ' ' & e.detail, 1 );
-									systemoutput( "#e.tagContext[1].template#: line #e.tagContext[1].line#", 1 );
+									var reducedTagContext = e.tagContext
+										.reduce( function( result, file ){
+											if ( !result.done ) {
+												if ( file.template.listLast( "/\" ) == "Painter.cfc" ) {
+													result.done = true;
+												} else {
+													result.rows.append( "#file.template#:#file.line#" );
+												}
+											}
+											return result;
+										}, { rows : [], done : false } )
+										.rows
+										.toList( chr( 13 ) & chr( 10 ) )
+
+									systemoutput( reducedTagContext, 1 );
 									rethrow;
 								}
 								stop();

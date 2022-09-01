@@ -11,13 +11,41 @@
  * TODO: make border customizable or be able to turn off completely
  */
 component extends='escher.models.AbstractWidget' accessors=true {
+    property name='boxOptions' type='struct';
 
     /**
-    * Allow children to be added via constructor, HOWEVER ther is no way to pass height in this case
-    * VeritcalPanel.init( widget1, widget2, widget3 )
-    * So they will all be auto-scaling
     */
-    function init() {
+    function init( struct boxOptions={} ) {
+        setBoxOptions( boxOptions );
+
+        // This goes away once we start using the drawBox helper here
+        if( !( boxOptions.border ?: true ) ) {
+            box.append(
+                {
+                    h : ' ',
+                    v : ' ',
+                    ul : ' ',
+                    ur : ' ',
+                    bl : ' ',
+                    br : ' ',
+                    hl : ' ',
+                    hr : ' ',
+                    vt : ' ',
+                    vb : ' ',
+                    llb : ' ',
+                    lrb : ' '
+                }
+            )
+        }
+
+        return this;
+    }
+
+    /**
+     * Add more than one page, all auto-scaling
+     * Panel.addPanes( widget1, widget2, widget3 )
+     */
+    function addPanes() {
         arguments.each( (k,v)=>addPane(v) );
         return this;
     }
@@ -47,6 +75,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
      * @width current width constraint
      */
     struct function render( required numeric height, required numeric width ) {
+        setCursorPosition( -1, -1 )
         // I need this to pass to super.render() below.
         var originalHeight = height;
         var originalWidth = width;
@@ -130,9 +159,13 @@ component extends='escher.models.AbstractWidget' accessors=true {
         for( var pane in children ) {
             paneNo++;
             // Get the rendered content for the nested widget
-            var paneLines = pane.widget.render( pane.actualHeight, width ).buffer;
+            var paneRendering = pane.widget.render( pane.actualHeight, width );
+
+            if( !isNull( paneRendering.cursorPosition ) ) {
+                setCursorPosition( paneRendering.cursorPosition.row+finalLines.len(), paneRendering.cursorPosition.col+2 )
+            }
             finalLines.append(
-                paneLines
+                paneRendering.buffer
                     // for each line
                     .map( (l)=>{
                         // Add our borders and buffers
@@ -146,8 +179,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
                     } )
             , true );
             // If our pane didn't give us enough rows, add blank filler rows
-            if( paneLines.len() < pane.actualHeight ) {
-                loop times=pane.actualHeight-paneLines.len() {
+            if( paneRendering.buffer.len() < pane.actualHeight ) {
+                loop times=pane.actualHeight-paneRendering.buffer.len() {
                     finalLines.append( box.v & repeatString( ' ', width+2 ) & box.v );
                 }
             }
