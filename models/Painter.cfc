@@ -20,6 +20,7 @@ component singleton accessors=true {
 	property name='active' type='boolean' default='false';
 	property name='taskScheduler';
 	property name='future';
+	property name='KeyListenerFuture';
 	property name='widget';
 
 	function onDIComplete() {
@@ -35,6 +36,7 @@ component singleton accessors=true {
 	*/
 	function start(iDrawable widget ) {
 		widget.start();
+		widget.emit( event='setFocus' )
 		setWidget( arguments.widget );
 
 		// If we have a dumb terminal or are running inside a CI server, skip the screen redraws all together.
@@ -47,10 +49,28 @@ component singleton accessors=true {
 				if( !getActive() ) {
 					setFuture(
 						getTaskScheduler().newSchedule( ()=>paint() )
-					        .every( 350 )
+					        .every( 200 )
 					        .start()
 					);
-
+					setKeyListenerFuture(
+						getTaskScheduler().newSchedule( ()=>{
+							try {
+								setting requestTimeout=999999999;
+								while( getWidget().isActive() ) {
+									var key = shell.waitForKey();
+									widget.emit( event='onKey', data={ key : key } )
+								}
+							} catch( any e ) {
+								if( !(e.type contains 'interrupt' || e.message contains 'interrupt' ) ) {
+									systemoutput( e.message & ' ' & e.detail, 1 );
+									systemoutput( "#e.tagContext[1].template#: line #e.tagContext[1].line#", 1 );
+									rethrow;
+								}
+								stop();
+							}
+						 } )
+					    .start()
+					);
 					setActive( true );
 				}
 			}
@@ -58,10 +78,13 @@ component singleton accessors=true {
 
 		try {
 			while( getActive() ) {
-				sleep( 200 );
+				sleep( 1000 );
 			}
 		} catch( any e ) {
 			stop();
+			if( !(e.type contains 'interrupt' || e.message contains 'interrupt' ) ) {
+				rethrow;
+			}
 		}
 	}
 
@@ -81,8 +104,14 @@ component singleton accessors=true {
 					setActive( false );
 
 					getFuture().cancel();
+					getKeyListenerFuture().cancel();
 					try {
 						getFuture().get();
+					} catch(any e) {
+						// Throws CancellationException
+					}
+					try {
+						getKeyListenerFuture().get();
 					} catch(any e) {
 						// Throws CancellationException
 					}
@@ -124,7 +153,7 @@ component singleton accessors=true {
 			);
 
 		} catch( any e ) {
-			if( !(e.type contains 'interrupt') ) {
+			if( !(e.type contains 'interrupt' || e.message contains 'interrupt' ) ) {
 				systemoutput( e.message & ' ' & e.detail, 1 );
 				systemoutput( "#e.tagContext[1].template#: line #e.tagContext[1].line#", 1 );
 				rethrow;

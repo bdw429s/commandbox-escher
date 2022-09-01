@@ -9,12 +9,9 @@
  * TODO: make border customizable or be able to turn off completely
  */
 component extends='escher.models.AbstractWidget' accessors=true {
-    //  Array of panes to display.  Each item contains struct with widget CFC instance, requestedWith, actualWidth, and lines
-    property name="panes" type="array";
 
-    variables.panes=[];
     /**
-     * Allow panes to be added via constructor, HOWEVER ther is no way to pass width in this case
+     * Allow children to be added via constructor, HOWEVER ther is no way to pass width in this case
     * HorizontalPanel.init( widget1, widget2, widget3 )
     * So they will all be auto-scaling
     */
@@ -30,7 +27,9 @@ component extends='escher.models.AbstractWidget' accessors=true {
      * @width N% for percentage, N for set number of cols, -1 for auto-scaling based on parent size
      */
     function addPane( iDrawable widget, width=-1 ) {
-        panes.append( {
+
+        //  Array of children to display.  Each item contains struct with widget CFC instance, requestedWith, actualWidth, and lines
+        children.append( {
             widget : widget,
             requestedWidth : width,
             actualWidth : 0,
@@ -43,7 +42,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
     }
 
     /**
-     * Build out bordered box with our panes inside
+     * Build out bordered box with our children inside
      *
      * @height current height constraint
      * @width current width constraint
@@ -55,16 +54,16 @@ component extends='escher.models.AbstractWidget' accessors=true {
         var originalWidth = width;
 
         // This is the effective size MINUS the borders.
-        width=width-4 - ((panes.len()-1)*3);
+        width=width-4 - ((children.len()-1)*3);
         height = height - 2;
 
-        // Now we calculate actual width of all panes.
+        // Now we calculate actual width of all children.
         // TODO, move this to separate function
         // The end result of this method is that the actualWidth will be populated for each pane
         // If the total actual widths is too large, the content will just get truncated
 
-        // Start with any panes asking for a set number of columns and give them precedence
-        var claimedCols = panes.reduce( (acc,p)=>{
+        // Start with any children asking for a set number of columns and give them precedence
+        var claimedCols = children.reduce( (acc,p)=>{
             if( !toString(p.requestedWidth).endsWith( '%' ) && p.requestedWidth != -1 ) {
                 // Actual width is just the exact width they asked for (dangerous for small screens)
                 p.actualWidth=p.requestedWidth;
@@ -75,8 +74,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
 
         var remainingCols = width-claimedCols;
         if( remainingCols > 0 ) {
-            //  Now calculate panes asking for a % of what's left (mixing panes with percentages AND set widths won't work that well)
-            var claimedPerc = panes.reduce( (acc,p)=>{
+            //  Now calculate children asking for a % of what's left (mixing children with percentages AND set widths won't work that well)
+            var claimedPerc = children.reduce( (acc,p)=>{
                 if( toString(p.requestedWidth).endsWith( '%' ) ) {
                     // Actual width is percentage of remaining columns (round down)
                     p.actualWidth=int( (p.requestedWidth.left(-1)/100)*remainingCols );
@@ -92,26 +91,26 @@ component extends='escher.models.AbstractWidget' accessors=true {
             }
 
             if( remainingCols > 0 ) {
-                // All remaining panes with width of -1 equally spread out over remaining space
-                // First, how many stretch panes are sharing the remaining columns?
-                var numStrectchPanes = panes.reduce( (acc,p)=>{
+                // All remaining children with width of -1 equally spread out over remaining space
+                // First, how many stretch children are sharing the remaining columns?
+                var numStrectchChildren = children.reduce( (acc,p)=>{
                     if( p.requestedWidth == -1 ) {
                         return acc+1;
                     }
                     return acc;
                 }, 0 );
                 var colsAvailbleForStretch = remainingCols;
-                if( numStrectchPanes ) {
-                    panes.each( (p)=>{
+                if( numStrectchChildren ) {
+                    children.each( (p)=>{
                         if( p.requestedWidth == -1 ) {
                             // Actual width is equal percentage of remaining columns (round down)
-                            p.actualWidth = int( colsAvailbleForStretch/numStrectchPanes );
+                            p.actualWidth = int( colsAvailbleForStretch/numStrectchChildren );
                             remainingCols -= p.actualWidth;
                         }
                     } );
                     // Based on the rounding, we may have extra space-- arbitrarily assign the left over it to the last stretch pane
                     if( remainingCols > 0 ) {
-                        panes.filter( (p)=>p.requestedWidth == -1 ).last().actualWidth+=remainingCols;
+                        children.filter( (p)=>p.requestedWidth == -1 ).last().actualWidth+=remainingCols;
                     }
 
                 }
@@ -121,14 +120,14 @@ component extends='escher.models.AbstractWidget' accessors=true {
         // Now that we know the final widths availble to each pane, ask them each to render themselves.
         // Since this is a horizontal panel, their height is our height (minus the borders which we trimmed above)
         // Store each pane's rendered lines and we'll assemble them below one line at a time
-        panes.each( (pane)=>pane.lines=pane.widget.render( height, pane.actualWidth ).buffer );
+        children.each( (pane)=>pane.lines=pane.widget.render( height, pane.actualWidth ).buffer );
 
         var finalLines = [];
-        // Let's do a pass over the panes to calulate thetop and bottom rows
+        // Let's do a pass over the children to calulate thetop and bottom rows
         var topRow = box.ul & box.h;
         var bottomRow = box.bl & box.h;
-        loop from=1 to=panes.len() index="local.paneNo" {
-            var pane = panes[ paneNo ];
+        loop from=1 to=children.len() index="local.paneNo" {
+            var pane = children[ paneNo ];
             var paneLabel = pane.widget.getLabel();
             if( len( paneLabel ) ) {
                 topRow &= box.h & box.llb & ' ' & paneLabel & ' ' & box.lrb & repeatString( box.h, pane.actualWidth-attr.stripAnsi( paneLabel ).length()-5 )
@@ -138,8 +137,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
 
             // Add border chars to represent each pane content width
             bottomRow &= repeatString( box.h, pane.actualWidth )
-            // At the break between panes, put our junction char in
-            if( paneNo < panes.len() ) {
+            // At the break between children, put our junction char in
+            if( paneNo < children.len() ) {
                 topRow &= box.h & box.vt & box.h;
                 bottomRow &= box.h & box.vb & box.h;
             }
@@ -152,8 +151,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
         loop from=1 to=height index="local.row" {
             var thisRow = box.v & ' ';
             // Now, grab the current line from each pane to assemble
-            loop from=1 to=panes.len() index="local.paneNo" {
-                var pane = panes[ paneNo ];
+            loop from=1 to=children.len() index="local.paneNo" {
+                var pane = children[ paneNo ];
                 // If our pane has content for this row, use it (the pane may not have rendered all the rows available)
                 if( row <= pane.lines.len() ) {
                     thisRow &= pane.lines[ row ];
@@ -167,8 +166,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
                 } else {
                     thisRow &= repeatString( ' ', pane.actualWidth );
                 }
-                //  For all panes but the last, put in our vertical beam and padding between panes
-                if( paneNo < panes.len() ) {
+                //  For all children but the last, put in our vertical beam and padding between children
+                if( paneNo < children.len() ) {
                     thisRow &= ' ' & box.v & ' ';
                 }
             }
@@ -186,12 +185,12 @@ component extends='escher.models.AbstractWidget' accessors=true {
     }
 
     function start() {
-        panes.each( (p)=>p.widget.start() );
+        children.each( (p)=>p.widget.start() );
         super.start();
     }
 
     function stop() {
-        panes.each( (p)=>p.widget.stop() );
+        children.each( (p)=>p.widget.stop() );
         super.stop();
     }
 

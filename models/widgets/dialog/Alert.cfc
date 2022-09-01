@@ -2,7 +2,7 @@
  * I display an alert for the user which can be dismissed with enter or escape
  * Types are info, warn, error, and success.
  */
-component extends='escher.models.widgets.Dialog' accessors=true {
+component extends='Dialog' accessors=true {
 
     function init( string message='', type='info', onSubmit=()=>{}, struct boxOptions={} ) {
         var colorMap = {

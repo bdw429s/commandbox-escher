@@ -7,6 +7,11 @@ component {
 	*
 	*/
 	function run() {
+
+
+		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( 'Enter Passphrase: ', (r)=>print.line( r ) ) );
+		return;
+
 		getInstance( 'Painter@escher' ).start( getInstance( 'Dialog@escher' ).init(
 			message : "This is some text which will be nicely wrapped.  The dialog will stretch to fit.",
 			label : "Hey, you!",
@@ -31,7 +36,6 @@ component {
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'time@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'weather@escher' ) );
-		getInstance( 'Painter@escher' ).start( getInstance( 'textInput@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'scroller@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'chart@escher' ).init( 'My Chart' ) );
 

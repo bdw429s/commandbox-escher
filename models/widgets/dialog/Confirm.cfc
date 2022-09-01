@@ -2,7 +2,7 @@
  * I show a yes/no confirmation to the user. Options can be selected with left, right, tab, shift tab, Y, and N
  * Press enter to submit
  */
-component extends='escher.models.widgets.Dialog' accessors=true {
+component extends='Dialog' accessors=true {
     // This is here so you can get the response back out of the widget instance after the user closes it if you don't have an onSubmit registered
     property name='response' type='boolean' default=true;
 

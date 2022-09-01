@@ -13,6 +13,10 @@ component implements='escher.models.IDrawable' accessors=true {
     // Array of "lines" of text representing the output of this widget
     property name="buffer" type="array";
     property name="backBuffer" type="array";
+    // An array of structs containing all composed widgets.  Each struct can have any keys, but will always have a 'widget' key.
+    property name="children" type="array";
+    // Listeners for emitted events
+    property name="listeners" type="struct";
     property name="active" type="boolean" default=false;
 	property name='taskScheduler';
 	property name='future';
@@ -23,6 +27,8 @@ component implements='escher.models.IDrawable' accessors=true {
 
     variables.buffer = [];
     variables.backBuffer = [];
+    variables.children=[];
+    variables.listeners={};
     // Re-usable Java proxy for creating attributed strings
 	variables.attr = createObject( 'java', 'org.jline.utils.AttributedString' );
     // Helper with border chars for box drawing
@@ -43,10 +49,6 @@ component implements='escher.models.IDrawable' accessors=true {
         shb : '▀', // Shadow bottom
         shls : '▄' // Shadow lower side
     };
-
-	function onDIComplete() {
-		setTaskScheduler( wirebox.getTaskScheduler() );
-	}
 
     /**
      * @Returns true/false if widget is active
@@ -175,6 +177,7 @@ component implements='escher.models.IDrawable' accessors=true {
      * You are responsible for also starting any composed widgets here
      */
     function start() {
+		setTaskScheduler( wirebox.getTaskScheduler() );
 
         // Mark widget as active
         setActive( true );
@@ -353,8 +356,23 @@ component implements='escher.models.IDrawable' accessors=true {
 
     }
 
+    /**
+     * Append new lines to the back buffer
+     * */
+    function drawLines( array lines ) {
+       getBuffer().append( lines, true );
+       return this;
+    }
+
+    /**
+     * Overlay another shape on top of the buffer
+     *
+     * @overlayLines
+     * @row
+     * @col
+     */
     function drawOverlay(
-        array overlayLines,
+        overlayLines,
         numeric row,
         numeric col
     ) {
@@ -365,7 +383,13 @@ component implements='escher.models.IDrawable' accessors=true {
         if( col < 1 ) {
             col = 1;
         }
-        // TODO: Allow overlayLines to be array, strut, or iDrawable
+
+        if( isStruct( overlayLines ) ) {
+            if(  overlayLines.cursorPosition.row ?: 0 > 0 && overlayLines.cursorPosition.col ?: 0 > 0 ) {
+                setCursorPosition(  overlayLines.cursorPosition.row+row-1,  overlayLines.cursorPosition.col+col-1 );
+            }
+            overlayLines = overlayLines.buffer;
+        }
 
         var outerLines = getBuffer();
         if( isNull( arguments.row ) ) {
@@ -385,8 +409,6 @@ component implements='escher.models.IDrawable' accessors=true {
             var overlayLineStart = arguments.col;
         }
 
-
-        //setCursorPosition( overLayRender.cursorPosition.row+startLine, overLayRender.cursorPosition.col+overlayLineStart-1 )
         var lineNo=0;
         for( var overlayLine in overlayLines ) {
             lineNo++;
@@ -512,4 +534,27 @@ component implements='escher.models.IDrawable' accessors=true {
 
         return text;
     }
+
+    boolean function emit( required string event, struct data={} ) {
+        if( variables.listeners.keyExists( event ) ) {
+            if( !(variables.listeners[ event ]( data = data ) ?: true ) ) {
+                return false;
+            }
+        }
+        for( var child in variables.children ) {
+            if( !( child.emit( event = event, data = data ) ?: true ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function registerListener( required string event, callback ) {
+        variables.listeners[ event ] = callback;
+    }
+
+    function getInstance() {
+        return wirebox.getInstance( argumentCollection=arguments );
+    }
+
 }

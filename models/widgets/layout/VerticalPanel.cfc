@@ -11,13 +11,9 @@
  * TODO: make border customizable or be able to turn off completely
  */
 component extends='escher.models.AbstractWidget' accessors=true {
-    //  Array of panes to display.  Each item contains struct with widget CFC instance, requestedHeight, actualHeight
-    property name="panes" type="array";
-
-    variables.panes=[];
 
     /**
-    * Allow panes to be added via constructor, HOWEVER ther is no way to pass height in this case
+    * Allow children to be added via constructor, HOWEVER ther is no way to pass height in this case
     * VeritcalPanel.init( widget1, widget2, widget3 )
     * So they will all be auto-scaling
     */
@@ -33,7 +29,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
      * @width N% for percentage, N for set number of cols, -1 for auto-scaling based on parent size
      */
     function addPane( iDrawable widget, height=-1 ) {
-        panes.append( {
+        children.append( {
             widget : widget,
             requestedHeight : height,
             actualHeight : 0
@@ -45,7 +41,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
     }
 
     /**
-     * Build out bordered box with our panes inside
+     * Build out bordered box with our children inside
      *
      * @height current height constraint
      * @width current width constraint
@@ -57,15 +53,15 @@ component extends='escher.models.AbstractWidget' accessors=true {
 
         // This is the effective size MINUS the borders.
         width=width-4;
-        height = height - 2 - (panes.len()-1);
+        height = height - 2 - (children.len()-1);
 
-        // Now we calculate actual width of all panes.
+        // Now we calculate actual width of all children.
         // TODO, move this to separate function
         // The end result of this method is that the actualHeight will be populated for each pane
         // If the total actual heights is too large, the content will just get truncated
 
-        // Start with any panes asking for a set number of rows and give them precedence
-        var claimedRows = panes.reduce( (acc,p)=>{
+        // Start with any children asking for a set number of rows and give them precedence
+        var claimedRows = children.reduce( (acc,p)=>{
             if( !toString(p.requestedHeight).endsWith( '%' ) && p.requestedHeight != -1 ) {
                 // Actual height is just the exact width they asked for (dangerous for small screens)
                 p.actualHeight=p.requestedHeight;
@@ -75,8 +71,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
         }, 0 );
         var remainingRows = height-claimedRows;
         if( remainingRows > 0 ) {
-            //  Now calculate panes asking for a % of what's left (mixing panes with percentages AND set heights won't work that well)
-            var claimedPerc = panes.reduce( (acc,p)=>{
+            //  Now calculate children asking for a % of what's left (mixing children with percentages AND set heights won't work that well)
+            var claimedPerc = children.reduce( (acc,p)=>{
                 if( toString(p.requestedHeight).endsWith( '%' ) ) {
                     // Actual height is percentage of remaining columns (round down)
                     p.actualHeight=int( (p.requestedHeight.left(-1)/100)*remainingRows );
@@ -91,26 +87,26 @@ component extends='escher.models.AbstractWidget' accessors=true {
                 throw( 'Pane height percentages total [#claimedPerc#] is greater than 100.' );
             }
             if( remainingRows > 0 ) {
-                // All remaining panes with height of -1 equally spread out over remaining space
-                // First, how many stretch panes are sharing the remaining rows?
-                var numStrectchPanes = panes.reduce( (acc,p)=>{
+                // All remaining children with height of -1 equally spread out over remaining space
+                // First, how many stretch children are sharing the remaining rows?
+                var numStrectchChildren = children.reduce( (acc,p)=>{
                     if( p.requestedHeight == -1 ) {
                         return acc+1;
                     }
                     return acc;
                 }, 0 );
                 var rowsAvailbleForStretch = remainingRows;
-                if( numStrectchPanes ) {
-                    panes.each( (p)=>{
+                if( numStrectchChildren ) {
+                    children.each( (p)=>{
                         if( p.requestedHeight == -1 ) {
                             // Actual width is equal percentage of remaining rows (round down)
-                            p.actualHeight = int( rowsAvailbleForStretch/numStrectchPanes );
+                            p.actualHeight = int( rowsAvailbleForStretch/numStrectchChildren );
                             remainingRows -= p.actualHeight;
                         }
                     } );
                     // Based on the rounding, we may have extra space-- arbitrarily assign the left over it to the last stretch pane
                     if( remainingRows > 0 ) {
-                        panes.filter( (p)=>p.requestedHeight == -1 ).last().actualHeight++;
+                        children.filter( (p)=>p.requestedHeight == -1 ).last().actualHeight++;
                     }
 
                 }
@@ -123,15 +119,15 @@ component extends='escher.models.AbstractWidget' accessors=true {
 
         var finalLines = [];
         // Top border line
-        var paneLabel = panes.first().widget.getLabel();
+        var paneLabel = children.first().widget.getLabel();
         if( len( paneLabel ) ) {
             finalLines.append( box.ul & box.h & box.llb & ' ' & paneLabel & ' '& box.lrb & repeatString( box.h, width+2-attr.stripAnsi( paneLabel ).length()-5 ) & box.ur )
         } else {
             finalLines.append( box.ul & repeatString( box.h, width+2 ) & box.ur )
         }
         var paneNo = 0;
-        // Loop over the panes, we'll assemble them as we go
-        for( var pane in panes ) {
+        // Loop over the children, we'll assemble them as we go
+        for( var pane in children ) {
             paneNo++;
             // Get the rendered content for the nested widget
             var paneLines = pane.widget.render( pane.actualHeight, width ).buffer;
@@ -155,9 +151,9 @@ component extends='escher.models.AbstractWidget' accessors=true {
                     finalLines.append( box.v & repeatString( ' ', width+2 ) & box.v );
                 }
             }
-            // For all panes but the last, but in our horizontal beam separator
-            if( paneNo < panes.len() ) {
-                var paneLabel = panes[paneNo+1].widget.getLabel();
+            // For all children but the last, but in our horizontal beam separator
+            if( paneNo < children.len() ) {
+                var paneLabel = children[paneNo+1].widget.getLabel();
                 if( len( paneLabel ) ) {
                     finalLines.append( box.hl & box.h & box.llb & ' ' & paneLabel & ' ' & box.lrb & repeatString( box.h, width+2-attr.stripAnsi( paneLabel ).length()-5 ) & box.hr )
                 } else {
@@ -174,12 +170,12 @@ component extends='escher.models.AbstractWidget' accessors=true {
     }
 
     function start() {
-        panes.each( (p)=>p.widget.start() );
+        children.each( (p)=>p.widget.start() );
         super.start();
     }
 
     function stop() {
-        panes.each( (p)=>p.widget.stop() );
+        children.each( (p)=>p.widget.stop() );
         super.stop();
     }
 
