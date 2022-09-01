@@ -15,21 +15,21 @@ component extends='escher.models.AbstractWidget' accessors=true {
         registerListener( 'onKey', (data)=>{
             if( asc( data.key ) == 13 || asc( data.key ) == 10 ) {
                 if( !isNull( getOnSubmit() ) ) {
-                    getOnSubmit()( children[1].getValue() );
+                    getOnSubmit()( children[1].widget.getValue() );
                 }
                 stop();
             }
         } );
 
         if( children.len() ) {
-            children[1].setLabel( prompt );
+            children[1].widget.setLabel( prompt );
         }
 
         return this;
     }
 
     function onDIComplete() {
-        setChildren( [ getInstance( 'TextInput@escher' ).init( prompt, 75) ] );
+        setChildren( [ { widget : getInstance( 'TextInput@escher' ).init( prompt, 75) } ] );
     }
 
     struct function render( required numeric height, required numeric width ) {
@@ -37,7 +37,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         clearBuffer()
         .drawBox( 4, 75 )
         .drawOverlay(
-            children[1].render( 1, 70 ),
+            children[1].widget.render( 1, 70 ),
             2,
             3
         )

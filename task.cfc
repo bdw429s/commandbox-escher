@@ -10,7 +10,7 @@ component {
 
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( 'Enter Passphrase: ', (r)=>print.line( r ) ) );
-		return;
+		//return;
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'Dialog@escher' ).init(
 			message : "This is some text which will be nicely wrapped.  The dialog will stretch to fit.",
@@ -32,7 +32,7 @@ component {
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'alert@escher' ).init( "The British are coming!", "error" ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'confirm@escher' ).init( "Release the robots? ", (response, dialog)=>print.line( 'You confirmed [#response#]' ) ) );
-		return;
+		//return;
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'time@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'weather@escher' ) );
@@ -55,7 +55,7 @@ component {
 					.addPane( getInstance( 'Scroller@escher' ) )
 					.setLabel( 'Log Files' )
 				),
-				getInstance( 'textInput@escher' ).init( 'Enter Password: ' )
+				getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
 			)
 		);
 		print.greenLine( 'Complete!' );

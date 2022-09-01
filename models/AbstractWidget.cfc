@@ -542,7 +542,7 @@ component implements='escher.models.IDrawable' accessors=true {
             }
         }
         for( var child in variables.children ) {
-            if( !( child.emit( event = event, data = data ) ?: true ) ) {
+            if( !( child.widget.emit( event = event, data = data ) ?: true ) ) {
                 return false;
             }
         }

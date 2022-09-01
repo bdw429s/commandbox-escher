@@ -7,10 +7,9 @@ component extends='escher.models.AbstractWidget' accessors=true {
     function init( string message='', label='', buttons=[], struct boxOptions={} ) {
         setMessage( message );
         setLabel( label );
-        setButtons( buttons );
+        setButtons( buttons, false );
         setBoxOptions( boxOptions );
         setSelectedButtonIndex(1);
-
 
         registerListener( 'onKey', (data)=>{
             if( data.key=='key_left' || data.key == 'back_tab' ) {
@@ -37,7 +36,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         return this;
     }
 
-    function setButtons( array buttons ) {
+    function setButtons( array buttons, process=true ) {
         variables.buttons = arguments.buttons;
 
         if( !buttons.len() ) {
@@ -50,7 +49,9 @@ component extends='escher.models.AbstractWidget' accessors=true {
                 setSelectedButtonIndex( i );
             }
         } );
-        process();
+        if( process ) {
+            process();
+        }
     }
 
     function process() {
