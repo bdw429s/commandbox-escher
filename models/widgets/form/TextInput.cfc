@@ -11,16 +11,15 @@ component extends='escher.models.AbstractWidget' accessors=true {
     function init( string inputLabel='Input Here: ',string inputName='Input Here: ', maxLength=50 ) {
         setInputLabel( inputLabel );
         setMaxLength( maxLength );
+        registerListener( 'onKey', (data)=>doKey( data.key ), ()=>isFocused() );
         return this;
     }
 
     function onFocus() {
         setCursorPosition( 1, len( inputLabel )+cursorRow )
-        registerListener( 'onKey', (data)=>doKey( data.key ) );
     }
 
     function onBlur() {
-        removeListener( 'onKey' );
         setCursorPosition( -1, -1 )
     }
 

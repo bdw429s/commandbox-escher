@@ -463,15 +463,21 @@ component implements='escher.models.IDrawable' accessors=true {
     }
 
     function drawButton(
+        label='',
         textColor='white',
         backgroundColor='blue',
         shadow,
-        label='',
         hotKey='',
-        selected=false,
+        selected,
         numeric row,
         numeric col
     ){
+        // If we explicitly passed te selected flag, assume we want the shadow space
+        var spaceMissingShadow = true;
+        if( isNull( arguments.selected ) ) {
+            arguments.selected = false;
+            spaceMissingShadow = false;
+        }
         var color='#( selected ? 'reversed': '' )##textColor#on#backgroundColor#';
         arguments.shadow = arguments.shadow ?: arguments.selected;
         var lines = [];
@@ -487,14 +493,16 @@ component implements='escher.models.IDrawable' accessors=true {
             var label3='';
         }
 
-        lines.append( print.t( ' #label1#', color ) & print.underscored( label2, color ) & print.t( '#label3# ', color ) & ( shadow ? print.grey( box.shls ) : '' ) );
+        lines.append( print.t( ' #label1#', color ) & print.underscored( label2, color ) & print.t( '#label3# ', color ) & ( shadow ? print.grey( box.shls ) : ( spaceMissingShadow ? ' ' : '' ) ) );
         if( shadow ) {
             lines.append( ' ' & print.grey( repeatString( box.shb, len( label )+2 ) ) );
+        } else if( spaceMissingShadow ) {
+            lines.append( ' ' & print.t( repeatString( ' ', len( label )+2 ) ) );
         }
         return drawOverlay(
             lines,
-            row,
-            col
+            row ?: nullValue(),
+            col ?: nullValue()
         );
 
     }
@@ -520,10 +528,10 @@ component implements='escher.models.IDrawable' accessors=true {
         numeric col
     ) {
 
-        if( row < 1 ) {
+        if( !isNull( row ) && row < 1 ) {
             row = 1;
         }
-        if( col < 1 ) {
+        if( !isNull( col ) && col < 1 ) {
             col = 1;
         }
 
@@ -537,17 +545,22 @@ component implements='escher.models.IDrawable' accessors=true {
         var outerLines = getBuffer();
         if( isNull( arguments.row ) ) {
             var midLine = int( outerLines.len()/2 );
-            var startLine = midLine - int( overLayLines.len()/2 );
+            var startLine = max( midLine - int( overLayLines.len()/2 ), 1 );
         } else {
             var startLine = arguments.row;
         }
 
         if( isNull( arguments.col ) ) {
-            var thisLine = attr.fromAnsi( outerLines[startLine] );
-            var thisLineWidth = thisLine.length();
-            var overlayLine = attr.fromAnsi( overlayLines[1] );
-            var overlayLineWidth = overlayLine.length();
-            var overlayLineStart = int( thisLineWidth/2 )-int( overlayLineWidth/2 );
+            if( outerLines.len() ) {
+                var thisLine = attr.fromAnsi( outerLines[startLine] );
+                var thisLineWidth = thisLine.length();
+                var overlayLine = attr.fromAnsi( overlayLines[1] );
+                var overlayLineWidth = overlayLine.length();
+                var overlayLineStart = int( thisLineWidth/2 )-int( overlayLineWidth/2 );
+            } else {
+                // If the buffer is empty, we start at 1
+                var overlayLineStart = 1;
+            }
         } else {
             var overlayLineStart = arguments.col;
         }
@@ -692,8 +705,8 @@ component implements='escher.models.IDrawable' accessors=true {
         return true;
     }
 
-    function registerListener( required string event, callback ) {
-        variables.listeners[ event ] = callback;
+    function registerListener( required string event, callback, when ) {
+        variables.listeners[ event ] = isNull( when ) ? callback : ()=>(when(data) ? callback(data) : true );
     }
 
     function removeListener( required string event ) {

@@ -9,27 +9,7 @@ component {
 	function run() {
 
 
-		getInstance( 'Painter@escher' ).start(
-			getInstance( 'HorizontalPanel@escher' )
-				.addPane( getInstance( 'VerticalPanel@escher' )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
-				)
-				.addPane( getInstance( 'VerticalPanel@escher' )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Password: ' ) )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Company: ' ) )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Foobar: ' ) )
-				)
 
-
-		);
-
-		return;
-
-
-		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( 'Enter Passphrase: ', (r)=>print.line( r ) ) );
-		//return;
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'Dialog@escher' ).init(
 			message : "This is some text which will be nicely wrapped.  The dialog will stretch to fit.",
@@ -49,6 +29,10 @@ component {
 			]
 		 ) );
 
+		 return;
+
+		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( 'Enter Passphrase: ', (r)=>print.line( r ) ) );
+		//return;
 		getInstance( 'Painter@escher' ).start( getInstance( 'alert@escher' ).init( "The British are coming!", "error" ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'confirm@escher' ).init( "Release the robots? ", (response, dialog)=>print.line( 'You confirmed [#response#]' ) ) );
 		//return;
@@ -58,6 +42,22 @@ component {
 		getInstance( 'Painter@escher' ).start( getInstance( 'scroller@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'chart@escher' ).init( 'My Chart' ) );
 
+
+		getInstance( 'Painter@escher' ).start(
+			getInstance( 'HorizontalPanel@escher' )
+				.addPane( getInstance( 'VerticalPanel@escher' )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
+				)
+				.addPane( getInstance( 'VerticalPanel@escher' )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Password: ' ) )
+					.addPane( getInstance( 'TextInput@escher' ).init( 'Company: ' ) )
+					.addPane( getInstance( 'Button@escher' ).init( ' Save! ' ) )
+				)
+
+
+		);
 
 		getInstance( 'Painter@escher' ).start(
 			getInstance( 'OverlayPanel@escher' ).init(
