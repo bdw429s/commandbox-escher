@@ -18,6 +18,27 @@ component extends='escher.models.AbstractWidget' accessors=true {
     */
     function init( struct boxOptions={} ) {
         setBoxOptions( boxOptions );
+
+        // This goes away once we start using the drawBox helper here
+        if( !( boxOptions.border ?: true ) ) {
+            box.append(
+                {
+                    h : ' ',
+                    v : ' ',
+                    ul : ' ',
+                    ur : ' ',
+                    bl : ' ',
+                    br : ' ',
+                    hl : ' ',
+                    hr : ' ',
+                    vt : ' ',
+                    vb : ' ',
+                    llb : ' ',
+                    lrb : ' '
+                }
+            )
+        }
+
         return this;
     }
 
