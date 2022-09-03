@@ -13,7 +13,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         setInputName( inputName );
         setHotKey( hotKey );
         if( !isNUll( arguments.onSubmit ) ) {
-            setnSubmit( onSubmit );
+            setOnSubmit( onSubmit );
         }
 
         registerListener( 'onKey', (data)=>doKey( data.key ), ()=>isFocused() );

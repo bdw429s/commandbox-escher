@@ -9,6 +9,30 @@ component {
 	function run() {
 
 
+		getInstance( 'Painter@escher' ).start(
+			getInstance( 'OverlayPanel@escher' ).init(
+				getInstance( 'HorizontalPanel@escher' )
+				.addPane(
+					getInstance( 'VerticalPanel@escher' )
+						.addPane( getInstance( 'Time@escher' ), '6' )
+						.addPane( getInstance( 'chart@escher' ).init( 'CPU Usage', 'red', '100' ) )
+						.addPane( getInstance( 'chart@escher' ).init( 'Memory', 'blue', 'auto' ) ),
+					'75%'
+				 )
+				.addPane( getInstance( 'VerticalPanel@escher' )
+					.addPane( getInstance( 'Scroller@escher' ), '50%' )
+					.addPane( getInstance( 'VerticalPanel@escher' ).init( { border : false } )
+						.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
+						.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
+						.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
+						.addPane( getInstance( 'TextInput@escher' ).init( 'Password: ' ) )
+					 )
+					 .setLabel( 'Log Files' )
+				),
+				getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
+			)
+		);
+		return;
 
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'Dialog@escher' ).init(
@@ -29,7 +53,7 @@ component {
 			]
 		 ) );
 
-		 return;
+		//return;
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( 'Enter Passphrase: ', (r)=>print.line( r ) ) );
 		//return;
@@ -59,29 +83,6 @@ component {
 
 		);
 
-		getInstance( 'Painter@escher' ).start(
-			getInstance( 'OverlayPanel@escher' ).init(
-				getInstance( 'HorizontalPanel@escher' )
-				.addPane(
-					getInstance( 'VerticalPanel@escher' )
-						.addPane( getInstance( 'Time@escher' ), '6' )
-						.addPane( getInstance( 'chart@escher' ).init( 'CPU Usage', 'red', '100' ) )
-						.addPane( getInstance( 'chart@escher' ).init( 'Memory', 'blue', 'auto' ) ),
-					'75%'
-				 )
-				.addPane( getInstance( 'VerticalPanel@escher' )
-					.addPane( getInstance( 'Scroller@escher' ), '50%' )
-					.addPane( getInstance( 'VerticalPanel@escher' ).init( { border : false } )
-						.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
-						.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
-						.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
-						.addPane( getInstance( 'TextInput@escher' ).init( 'Password: ' ) )
-					 )
-					 .setLabel( 'Log Files' )
-				)//,
-				//getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
-			)
-		);
 		print.greenLine( 'Complete!' );
 	}
 

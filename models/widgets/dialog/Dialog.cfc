@@ -1,60 +1,48 @@
 component extends='escher.models.AbstractWidget' accessors=true {
     property name='message' type='string';
-    property name='buttons' type='array';
-    property name='selectedButtonIndex' type='numeric';
     property name='boxOptions' type='struct';
 
     function init( string message='', label='', buttons=[], struct boxOptions={} ) {
         setMessage( message );
         setLabel( label );
-        setButtons( buttons, false );
         setBoxOptions( boxOptions );
-        setSelectedButtonIndex(1);
 
         registerListener( 'onKey', (data)=>{
-            if( data.key=='key_left' || data.key == 'back_tab' ) {
-                if( selectedButtonIndex > 1 ) {
-                    selectedButtonIndex--;
-                    process();
-                }
-            } else if( data.key == 'key_right' || asc(data.key) == 9 ) {
-                if( selectedButtonIndex < buttons.len() ) {
-                    selectedButtonIndex++;
-                    process();
-                }
+            if( data.key=='key_left' ) {
+                emit( 'retractFocus', { success : false } );
+            } else if( data.key == 'key_right' ) {
+                emit( 'advanceFocus', { success : false }  );
             // TODO: Prevent some dialogs from being escaped (force the user to answer)?
             } else if( data.key == 'escape' ) {
                 stop();
-            } else if( asc( data.key ) == 10 || asc( data.key ) == 13 ) {
-                if( selectedButtonIndex && buttons[ selectedButtonIndex ].keyExists( 'onSubmit' ) && isCustomFunction( buttons[ selectedButtonIndex ].onSubmit ) ) {
-                    buttons[ selectedButtonIndex ].onSubmit( this )
-                }
-                stop();
             }
         } );
+
+
+        if( arguments.buttons.len() ) {
+            var buttonPanel = application.wirebox.getInstance( 'HorizontalPanel@escher' )
+                .init( boxOptions : { border : false } );
+            arguments.buttons.each( (b)=>buttonPanel.addPane(
+                application.wirebox.getInstance( 'Button@escher' ).init(
+                    inputLabel : b.label,
+                    inputName : 'button',
+                    hotKey : b.hotKey ?: '',
+                    onSubmit : ()=>{
+                        if( !isNull( b.onSubmit ) ) {
+                            b.onSubmit( this );
+                        }
+                        stop();
+                    }
+                )
+            ) );
+
+            children.append( { widget : buttonPanel } );
+        }
 
         return this;
     }
 
-    function setButtons( array buttons, process=true ) {
-        variables.buttons = arguments.buttons;
-
-        if( !buttons.len() ) {
-            setSelectedButtonIndex( 0 );
-            return this;
-        }
-
-        buttons.each( (b,i)=>{
-            if( b.selected ?: false ) {
-                setSelectedButtonIndex( i );
-            }
-        } );
-        if( process ) {
-            process();
-        }
-    }
-
-    function process() {
+    struct function render( required numeric height, required numeric width ) {
 
         var boxOptions = getBoxOptions();
         boxOptions.width = boxOptions.width ?: 75;
@@ -65,9 +53,10 @@ component extends='escher.models.AbstractWidget' accessors=true {
             horizontalStrategy='wordWrap',
             textAlign='center'
         );
-        boxOptions.height=messageLines.len()+7;
+        boxOptions.height=messageLines.len()+8;
         boxOptions.borderColor = boxOptions.borderColor ?: 'blue';
         boxOptions.label = boxOptions.label ?: getLabel();
+
 
         clearBuffer()
         .drawBox( argumentCollection=boxOptions )
@@ -76,27 +65,18 @@ component extends='escher.models.AbstractWidget' accessors=true {
             3,
             7
         );
-        // Calc button spacing
-        var usedWidth = buttons.len()*3 + buttons.reduce( (len,b)=>{return len+len( b.label ) }, 0 );
-        if( usedWidth > boxOptions.width-4 ) {
-            // TODO: wrap buttons
-            throw( 'Buttons are too wide for the dialog' );
-        }
-        var spaceBetween = int( boxOptions.width-4-usedWidth )/(buttons.len()+1);
-        var currOffset=3+spaceBetween;
-        buttons.each( (b,i)=>{
 
-            drawButton(
-                label=b.label,
-                hotKey=b.hotKey ?: '',
-                selected=( getSelectedButtonIndex()==i ),
-                row=messageLines.len()+4,
-                col=currOffset
+        if( children.len() ) {
+            drawOverlay(
+                children.first().widget.render( 4, boxOptions.width-5 ),
+                messageLines.len()+3,
+                2
             );
-            currOffset += len( b.label ) + 3 + spaceBetween;
-        } );
+        }
 
         commitBuffer();
+
+        return super.render( height, width );
     }
 
 }

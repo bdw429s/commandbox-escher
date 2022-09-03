@@ -69,82 +69,8 @@ component implements='escher.models.IDrawable' accessors=true {
             // Don't propagate automatically
             return false;
         },
-        'advanceFocus' : (data) => {
-            // If I'm not already focused
-            if( !isFocused() ) {
-                throw( "#getLabel()# Can't advance, I don't have focus" );
-            // If I already have focus
-            } else {
-                // If I have no children, I can't do anything
-                if( children.len() ) {
-
-                    // find the currently focused one
-                    var focusedChildIndex = 0;
-                    children.each( (c,i)=>c.widget.isFocused() ? focusedChildIndex=i : '' )
-                    if( focusedChildIndex ) {
-
-                        // If child successfully advanced focus
-                        children[ focusedChildIndex ].widget.emit( 'advanceFocus', data )
-
-                        if( !data.success ) {
-                            // Is there a "next" child to give focus to?
-                            if( focusedChildIndex < children.len() ) {
-                                // Unfocus the previous child
-                                children[ focusedChildIndex ].widget.emit( 'removeFocus' );
-
-                                // Give the focus to the new one
-                                children[ focusedChildIndex+1 ].widget.emit( 'setFocus' );
-
-                                // Handled!
-                                data.success = true;
-                            }
-                        }
-
-                    }
-                }
-
-            }
-            // Never propagate
-            return false;
-        },
-        'retractFocus' : (data) => {
-            // If I'm not already focused
-            if( !isFocused() ) {
-                throw( "#getLabel()# Can't retract, I don't have focus" );
-            // If I already have focus
-            } else {
-                // If I have no children, I can't do anything
-                if( children.len() ) {
-
-                    // find the currently focused one
-                    var focusedChildIndex = 0;
-                    children.each( (c,i)=>c.widget.isFocused() ? focusedChildIndex=i : '' )
-                    if( focusedChildIndex ) {
-
-                        // If child successfully advanced focus
-                        children[ focusedChildIndex ].widget.emit( 'retractFocus', data )
-
-                        if( !data.success ) {
-                            // Is there a "previous" child to give focus to?
-                            if( focusedChildIndex > 1 ) {
-                                // Unfocus the previous child
-                                children[ focusedChildIndex ].widget.emit( 'removeFocus' );
-
-                                // Give the focus to the new one
-                                children[ focusedChildIndex-1 ].widget.emit( 'setFocus', { backwards : true } );
-
-                                // Handled!
-                                data.success = true;
-                            }
-                        }
-
-                    }
-                }
-
-            }
-            // Never propagate
-            return false;
-        }
+        'advanceFocus' : advanceFocus,
+        'retractFocus' : retractFocus
     };
     // Re-usable Java proxy for creating attributed strings
 	variables.attr = createObject( 'java', 'org.jline.utils.AttributedString' );
@@ -167,6 +93,85 @@ component implements='escher.models.IDrawable' accessors=true {
         shb : '▀', // Shadow bottom
         shls : '▄' // Shadow lower side
     };
+
+    function advanceFocus(data) {
+        // If I'm not already focused
+        if( !isFocused() ) {
+            throw( "#getLabel()# Can't advance, I don't have focus" );
+        // If I already have focus
+        } else {
+            // If I have no children, I can't do anything
+            if( children.len() ) {
+
+                // find the currently focused one
+                var focusedChildIndex = 1;
+                children.each( (c,i)=>c.widget.isFocused() ? focusedChildIndex=i : '' )
+                if( focusedChildIndex ) {
+
+                    // If child successfully advanced focus
+                    children[ focusedChildIndex ].widget.emit( 'advanceFocus', data )
+
+                    if( !data.success ) {
+                        // Is there a "next" child to give focus to?
+                        if( focusedChildIndex < children.len() ) {
+                            // Unfocus the previous child
+                            children[ focusedChildIndex ].widget.emit( 'removeFocus' );
+
+                            // Give the focus to the new one
+                            children[ focusedChildIndex+1 ].widget.emit( 'setFocus' );
+
+                            // Handled!
+                            data.success = true;
+                        }
+                    }
+
+                }
+            }
+
+        }
+        // Never propagate
+        return false;
+    }
+
+    function retractFocus(data) {
+        // If I'm not already focused
+        if( !isFocused() ) {
+            throw( "#getLabel()# Can't retract, I don't have focus" );
+        // If I already have focus
+        } else {
+            // If I have no children, I can't do anything
+            if( children.len() ) {
+
+                // find the currently focused one
+                var focusedChildIndex = 0;
+                children.each( (c,i)=>c.widget.isFocused() ? focusedChildIndex=i : '' )
+                if( focusedChildIndex ) {
+
+                    // If child successfully advanced focus
+                    children[ focusedChildIndex ].widget.emit( 'retractFocus', data )
+
+                    if( !data.success ) {
+                        // Is there a "previous" child to give focus to?
+                        if( focusedChildIndex > 1 ) {
+                            // Unfocus the previous child
+                            children[ focusedChildIndex ].widget.emit( 'removeFocus' );
+
+                            // Give the focus to the new one
+                            children[ focusedChildIndex-1 ].widget.emit( 'setFocus', { backwards : true } );
+
+                            // Handled!
+                            data.success = true;
+
+                        }
+                    }
+
+                }
+            }
+
+        }
+        // Never propagate
+        return false;
+    }
 
     /**
      * Returns whether this widget currenlty has focus
@@ -289,8 +294,8 @@ component implements='escher.models.IDrawable' accessors=true {
         /* testing
         if( isFocused() ) {
             data.buffer=data.buffer.map((l)=>'*'&attr.fromAnsi(l).subSequence(1,attr.fromAnsi(l).length()))
-        }
-        */
+        }*/
+
 
         return data;
     }
@@ -706,7 +711,7 @@ component implements='escher.models.IDrawable' accessors=true {
     }
 
     function registerListener( required string event, callback, when ) {
-        variables.listeners[ event ] = isNull( when ) ? callback : ()=>(when(data) ? callback(data) : true );
+        variables.listeners[ event ] = isNull( when ) ? callback : (data)=>(when(data) ? callback(data) : true );
     }
 
     function removeListener( required string event ) {

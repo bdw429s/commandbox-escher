@@ -33,6 +33,37 @@ component extends='escher.models.AbstractWidget' accessors=true{
             return false;
         } );
 
+        registerListener( 'advanceFocus', (data) => {
+            // If there is an overlay, it gets focus
+            if( !isNull( overlay ) && overlay.isActive() ) {
+                overlay.emit( 'advanceFocus', data );
+                // Stop default propagation
+                return false;
+            }
+            // Otherwise, default behavior
+            if( !pane.isFocused() ) {
+                pane.emit( 'setFocus' );
+            }
+            pane.emit( 'advanceFocus', data );
+            return false;
+        } );
+
+        registerListener( 'retractFocus', (data) => {
+            // If there is an overlay, it gets focus
+            if( !isNull( overlay ) && overlay.isActive() ) {
+                overlay.emit( 'retractFocus', data );
+                // Stop default propagation
+                return false;
+            }
+            // Otherwise, default behavior
+            if( !pane.isFocused() ) {
+                pane.emit( 'setFocus' );
+            }
+            pane.emit( 'retractFocus', data );
+            return false;
+        } );
+
+
         return this;
     }
 
