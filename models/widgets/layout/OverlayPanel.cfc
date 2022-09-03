@@ -41,9 +41,6 @@ component extends='escher.models.AbstractWidget' accessors=true{
                 return false;
             }
             // Otherwise, default behavior
-            if( !pane.isFocused() ) {
-                pane.emit( 'setFocus' );
-            }
             pane.emit( 'advanceFocus', data );
             return false;
         } );
@@ -56,9 +53,6 @@ component extends='escher.models.AbstractWidget' accessors=true{
                 return false;
             }
             // Otherwise, default behavior
-            if( !pane.isFocused() ) {
-                pane.emit( 'setFocus' );
-            }
             pane.emit( 'retractFocus', data );
             return false;
         } );
@@ -111,8 +105,13 @@ component extends='escher.models.AbstractWidget' accessors=true{
                 pageRender.buffer[startLine+lineNo] =  thisLine.subSequence( 0, overlayLineStart-1 ).toAnsi() & overlayLine.toAnsi() & thisLine.subSequence( overlayLineStart+overlayLineWidth-1, thisLineWidth ).toAnsi();
             }
         } else {
+            if( !pane.isFocused() ) {
+                pane.emit( 'setFocus' );
+            }
             if( !isNull( pageRender.cursorPosition ) ) {
                 setCursorPosition( pageRender.cursorPosition.row, pageRender.cursorPosition.col )
+            } else {
+                setCursorPosition( -1, -1 )
             }
         }
         setBuffer( pageRender.buffer )

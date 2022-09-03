@@ -20,11 +20,13 @@ component extends='Dialog' accessors=true {
             buttons : [
 				{
                     label : ' Yes ',
+                    hotkey : 'Y',
                     selected : true,
 					onSubmit : (dialog)=>onSubmit( putResponse( true ), dialog )
 				},
 				{
                     label : ' No ',
+                    hotkey : 'N',
 					onSubmit : (dialog)=>onSubmit( putResponse( false ), dialog )
 				}
             ],

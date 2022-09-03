@@ -25,9 +25,8 @@ component extends='escher.models.AbstractWidget' accessors=true {
 
     struct function render( required numeric height, required numeric width ) {
         // TODO: allow text to sroll inside of control
-        maxLength = min( maxLength, width );
         setBuffer( [
-            getInputLabel() & print.boldBlackOnSilverBackground( inputValue & repeatString( ' ', (min(maxLength,width)-len(getInputLabel() & inputValue) ) ) )
+            getInputLabel() & print.boldBlackOnSilverBackground( inputValue & repeatString( ' ', (width-len(getInputLabel() & inputValue) ) ) )
         ] );
 
         return super.render( height, width );

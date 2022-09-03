@@ -7,6 +7,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
     property name='inputName' type='string';
     property name='hotKey' type='string';
     property name='onSubmit';
+    property name='depressed' type='boolean' default='false';
 
     function init( string inputLabel=' Submit ',string inputName='button', hotKey='', onSubmit ) {
         setInputLabel( inputLabel );
@@ -16,7 +17,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
             setOnSubmit( onSubmit );
         }
 
-        registerListener( 'onKey', (data)=>doKey( data.key ), ()=>isFocused() );
+        registerListener( 'onKey', (data)=>doKey( data.key ) );
 
         return this;
     }
@@ -27,23 +28,45 @@ component extends='escher.models.AbstractWidget' accessors=true {
         .drawButton(
             label : inputLabel,
             selected : isFocused(),
-            hotKey : hotKey
+            hotKey : hotKey,
+            depressed : depressed
          )
         .commitBuffer();
 
         return super.render( height, width );
     }
 
+    function onPress() {
+        depressed=true;
+        sleep(300)
+        depressed=false;
+        sleep(200)
+        if( !isNUll( variables.onSubmit ) ) {
+            variables.onSubmit( this );
+        }
+    }
+
     function doKey( key ) {
+        // TODO: Find way for button to know if it's in a form and submit the form automatically
         var keyCode = asc( key );
+        // Listen for hotkeys even when not focused
+        if( len( hotKey )
+            && ( keyCode == asc( lCase( hotKey ) )
+              || keyCode == asc( uCase( hotKey ) ) )
+        ) {
+            onPress();
+        }
+
+        if( !isFocused() ) {
+            return;
+        }
+
+        // Must be focused to listen to Enter
         if(    keyCode == 13
             || keyCode == 10
-            || ( len( hotKey ) && keyCode == asc( hotKey ) )
+            || ( len( hotKey ) && ( keyCode == asc( lCase( hotKey ) ) || keyCode == asc( uCase( hotKey ) ) ) )
         ) {
-            if( !isNUll( variables.onSubmit ) ) {
-                variables.onSubmit( this );
-            }
-            // TODO: Find way for button to know if it's in a form and submit the form automatically
+            onPress()
         }
 
     }

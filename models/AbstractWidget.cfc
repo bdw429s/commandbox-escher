@@ -6,6 +6,7 @@ component implements='escher.models.IDrawable' accessors=true {
 	property name="print" inject="print";
 	property name='wirebox' inject='wirebox';
     property name='shell' inject='shell';
+    property name='log' inject='logbox:logger:{this}';
 
     // Store row/col struct for current cursor position.  Not needed if this widget doesn't ever need the cursor drawn
     // If null, it means the widget does not require the cursor to be anywhere on screen and it will not be sent back from render()
@@ -104,13 +105,12 @@ component implements='escher.models.IDrawable' accessors=true {
             if( children.len() ) {
 
                 // find the currently focused one
-                var focusedChildIndex = 1;
+                var focusedChildIndex = 0;
                 children.each( (c,i)=>c.widget.isFocused() ? focusedChildIndex=i : '' )
                 if( focusedChildIndex ) {
 
                     // If child successfully advanced focus
                     children[ focusedChildIndex ].widget.emit( 'advanceFocus', data )
-
                     if( !data.success ) {
                         // Is there a "next" child to give focus to?
                         if( focusedChildIndex < children.len() ) {
@@ -294,8 +294,8 @@ component implements='escher.models.IDrawable' accessors=true {
         /* testing
         if( isFocused() ) {
             data.buffer=data.buffer.map((l)=>'*'&attr.fromAnsi(l).subSequence(1,attr.fromAnsi(l).length()))
-        }*/
-
+        }
+        */
 
         return data;
     }
@@ -474,6 +474,7 @@ component implements='escher.models.IDrawable' accessors=true {
         shadow,
         hotKey='',
         selected,
+        depressed=false,
         numeric row,
         numeric col
     ){
@@ -483,7 +484,7 @@ component implements='escher.models.IDrawable' accessors=true {
             arguments.selected = false;
             spaceMissingShadow = false;
         }
-        var color='#( selected ? 'reversed': '' )##textColor#on#backgroundColor#';
+        var color='#( !selected ? 'reversed': '' )##textColor#on#backgroundColor#';
         arguments.shadow = arguments.shadow ?: arguments.selected;
         var lines = [];
 
@@ -498,11 +499,21 @@ component implements='escher.models.IDrawable' accessors=true {
             var label3='';
         }
 
-        lines.append( print.t( ' #label1#', color ) & print.underscored( label2, color ) & print.t( '#label3# ', color ) & ( shadow ? print.grey( box.shls ) : ( spaceMissingShadow ? ' ' : '' ) ) );
-        if( shadow ) {
-            lines.append( ' ' & print.grey( repeatString( box.shb, len( label )+2 ) ) );
-        } else if( spaceMissingShadow ) {
-            lines.append( ' ' & print.t( repeatString( ' ', len( label )+2 ) ) );
+        var buttonText = print.t( ' #label1#', color ) & print.underscored( label2, color ) & print.t( '#label3# ', color );
+
+        if( depressed ) {
+            lines.append( repeatString( ' ', len( label ) ) & ( spaceMissingShadow ? ' ' : '' ) );
+            lines.append( ' ' & buttonText & ' ' );
+            if( spaceMissingShadow ) {
+                lines.append( ' ' & print.t( repeatString( ' ', len( label )+2 ) ) );
+            }
+        } else {
+            lines.append( buttonText & ( shadow ? print.grey( box.shls ) : ( spaceMissingShadow ? ' ' : '' ) ) );
+            if( shadow ) {
+                lines.append( ' ' & print.grey( repeatString( box.shb, len( label )+2 ) ) );
+            } else if( spaceMissingShadow ) {
+                lines.append( ' ' & print.t( repeatString( ' ', len( label )+2 ) ) );
+            }
         }
         return drawOverlay(
             lines,

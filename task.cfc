@@ -9,6 +9,8 @@ component {
 	function run() {
 
 
+		getInstance( 'Painter@escher' ).start( getInstance( 'alert@escher' ).init( "The British are coming!", "error" ) );
+
 		getInstance( 'Painter@escher' ).start(
 			getInstance( 'OverlayPanel@escher' ).init(
 				getInstance( 'HorizontalPanel@escher' )
@@ -29,10 +31,10 @@ component {
 					 )
 					 .setLabel( 'Log Files' )
 				),
-				getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
+				//getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
+				getInstance( 'confirm@escher' ).init( "Release the robots? ", (response, dialog)=>print.line( 'You confirmed [#response#]' ) )
 			)
 		);
-		return;
 
 
 		getInstance( 'Painter@escher' ).start( getInstance( 'Dialog@escher' ).init(

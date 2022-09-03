@@ -19,7 +19,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
         } );
 
 
-        if( arguments.buttons.len() ) {
+        if( arguments.buttons.len() && !children.len() ) {
             var buttonPanel = application.wirebox.getInstance( 'HorizontalPanel@escher' )
                 .init( boxOptions : { border : false } );
             arguments.buttons.each( (b)=>buttonPanel.addPane(
