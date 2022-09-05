@@ -17,8 +17,8 @@ component {
 				.addPane(
 					getInstance( 'VerticalPanel@escher' )
 						.addPane( getInstance( 'Time@escher' ), '6' )
-						.addPane( getInstance( 'chart@escher' ).init( 'CPU Usage', 'red', '100' ) )
-						.addPane( getInstance( 'chart@escher' ).init( 'Memory', 'blue', 'auto' ) ),
+						.addPane( getInstance( 'chartDemo@escher' ).init( 'CPU Usage', 'red', '100' ) )
+						.addPane( getInstance( 'chartDemo@escher' ).init( 'Memory', 'blue', 'auto' ) ),
 					'75%'
 				 )
 				.addPane( getInstance( 'VerticalPanel@escher' )
@@ -66,7 +66,7 @@ component {
 		getInstance( 'Painter@escher' ).start( getInstance( 'time@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'weather@escher' ) );
 		getInstance( 'Painter@escher' ).start( getInstance( 'scroller@escher' ) );
-		getInstance( 'Painter@escher' ).start( getInstance( 'chart@escher' ).init( 'My Chart' ) );
+		getInstance( 'Painter@escher' ).start( getInstance( 'chartDemo@escher' ).init( 'My Chart' ) );
 
 
 		getInstance( 'Painter@escher' ).start(
