@@ -10,7 +10,7 @@ component extends='escher.models.widgets.data.MiniChart' accessors=true {
             var previousValue = seriesData.len() ? seriesData.last() : 50;
             if( previousvalue < 0 ) previousValue+=10
             if( val( YMax ) && previousvalue > YMax ) previousValue-=10
-           return previousValue + randRange(-5,5);
+            return max( previousValue + randRange(-5,5), 0 );
         } );
         return this;
     }
