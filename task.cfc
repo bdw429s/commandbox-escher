@@ -9,7 +9,8 @@ component {
 	function run() {
 
 
-		getInstance( 'Painter@escher' ).start( getInstance( 'alert@escher' ).init( "The British are coming!", "error" ) );
+		getInstance( 'Painter@escher' ).start( getInstance( 'MiniChart@escher' ).init(  ) );
+		return;
 
 		getInstance( 'Painter@escher' ).start(
 			getInstance( 'OverlayPanel@escher' ).init(
