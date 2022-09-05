@@ -4,18 +4,6 @@
 component extends='escher.models.widgets.data.AbstractChart' accessors=true {
     processingdirective pageEncoding='UTF-8';
 
-    function init( string title='', color='blue', YMax=100 ) {
-        super.init( argumentCollection=arguments );
-        setProduceIntervalMS( 200 );
-        setDataProducer( ()=>{
-            var previousValue = seriesData.len() ? seriesData.last() : 50;
-            if( previousvalue < 0 ) previousValue+=10
-            if( val( YMax ) && previousvalue > YMax ) previousValue-=10
-           return max( previousValue + randRange(-5,5), 0);
-        } );
-        return this;
-    }
-
     variables.chars = {
         '00' : 10240, //
         '01' : 10368, //
