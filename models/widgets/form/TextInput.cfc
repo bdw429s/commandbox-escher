@@ -7,10 +7,12 @@ component extends='escher.models.AbstractWidget' accessors=true {
     property name='inputName' type='string';
     property name='cursorRow' type='numeric' default='1';
     property name='maxLength' type='numeric';
+    property name='mask' type='string';
 
-    function init( string inputLabel='Input Here: ',string inputName='Input Here: ', maxLength=50 ) {
+    function init( string inputLabel='Input Here: ', string inputName='Input Here: ', maxLength=50, mask='' ) {
         setInputLabel( inputLabel );
         setMaxLength( maxLength );
+        setMask( mask );
         registerListener( 'onKey', (data)=>doKey( data.key ), ()=>isFocused() );
         return this;
     }
@@ -25,8 +27,12 @@ component extends='escher.models.AbstractWidget' accessors=true {
 
     struct function render( required numeric height, required numeric width ) {
         // TODO: allow text to sroll inside of control
+        var inputValueToShow = inputValue;
+        if( len( mask ) ) {
+            inputValueToShow = repeatString( left( mask, 1 ), len( inputValue ) );
+        }
         setBuffer( [
-            getInputLabel() & print.boldBlackOnSilverBackground( inputValue & repeatString( ' ', (width-len(getInputLabel() & inputValue) ) ) )
+           getInputLabel() & print.boldBlackOnSilverBackground( inputValueToShow & repeatString( ' ', (width-len(getInputLabel() & inputValue) ) ) )
         ] );
 
         return super.render( height, width );

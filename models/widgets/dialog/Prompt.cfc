@@ -5,9 +5,14 @@ component extends='escher.models.AbstractWidget' accessors=true {
     property name='prompt' type='string' default='';
     property name='cursorRow' type='numeric' default='1';
     property name='onSubmit';
+    property name='mask' type='string';
 
-    function init( string prompt='Input Here: ', onSubmit ) {
+    function init( string prompt='Input Here: ', onSubmit, mask='' ) {
         setPrompt( prompt );
+        setMask( mask );
+        if( children.len() ) {
+            children.first().widget.setMask( mask );
+        }
         if( !isNull( onSubmit ) ) {
             setOnSubmit( onSubmit );
         }
@@ -29,7 +34,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
     }
 
     function onDIComplete() {
-        setChildren( [ { widget : getInstance( 'TextInput@escher' ).init( prompt, 75) } ] );
+        setChildren( [ { widget : getInstance( 'TextInput@escher' ).init( inputLabel=prompt, maxLength=75, mask=mask) } ] );
     }
 
     struct function render( required numeric height, required numeric width ) {

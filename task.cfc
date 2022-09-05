@@ -8,8 +8,9 @@ component {
 	*/
 	function run() {
 
+		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( inputLabel='Enter Passphrase: ', mask='*', onSubmit=(r)=>print.line( r ) ) );
 
-		getInstance( 'Painter@escher' ).start( getInstance( 'MiniChart@escher' ).init(  ) );
+		getInstance( 'Painter@escher' ).start( getInstance( 'MiniChartDemo@escher' ).init(  ) );
 		return;
 
 		getInstance( 'Painter@escher' ).start(
