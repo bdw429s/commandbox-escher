@@ -33,21 +33,26 @@ component accessors=true{
 
     function getProcessList(){
         return getOS().getProcesses()
-                .filter((p,idx)=> { return idx < 30})
-                .map((p)=>{
-                    var threads = {
-                        "name": p.getName(),
-                        "pid": p.getProcessID(),
-                        "ev": p.getEnvironmentVariables().toString(),
-                        "cwd":p.getCurrentWorkingDirectory(),
-                        "cpu": p.getProcessCpuLoadCumulative(),
-                        "folder": listLast(p.getCurrentWorkingDirectory(),'/'),
-                        "resident": getSize(p.getResidentSetSize()),
-                        "virtual": getSize(p.getVirtualSize()),
-                        "service": listLast(p.getCurrentWorkingDirectory(),'/')
+                .reduce((acc,p,idx)=>{
+                    try{
+
+                        var threads = {
+                            "name": p.getName(),
+                            "pid": p.getProcessID(),
+                            //"ev": p.getEnvironmentVariables().toString(),
+                            "cwd":p.getCurrentWorkingDirectory(),
+                            "cpu": round(p.getProcessCpuLoadCumulative() * 100) & '%',
+                            "folder": listLast(p.getCurrentWorkingDirectory(),'/'),
+                            "resident": getSize(p.getResidentSetSize()),
+                            "virtual": getSize(p.getVirtualSize()),
+                            "service": listLast(p.getCurrentWorkingDirectory(),'/')
+                        }
+                        acc.append(threads);
+                    } catch (any e){
+
                     }
-                    return threads;
-                })
+                    return acc;
+                },[])
     }
 
     function getNetwork() {

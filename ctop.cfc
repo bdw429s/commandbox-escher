@@ -29,9 +29,11 @@ component {
                                             var cpu = osUtil.getCpu();
                                             return cpu.used;
                                         }
-                                    ))						            
-                                    .addPane(get('miniChartDemo').init("title"))
-						            .addPane(get('miniChartDemo').init("title"))
+                                    ),1)						            
+                                    .addPane( get('List').init("CPU Usage",()=>{
+                                        var cpu = osUtil.getCpu();
+                                        return cpu
+                                    }))
                             )
 				            .addPane(
                                 get( 'vbox' ).init( { border : false } )
@@ -86,28 +88,26 @@ component {
                             get( 'hbox' )
                                 .addPane(
                                     get('Table').init("CPU Usage",()=>{
-                                        var cpu = osUtil.getCpu();
-                                        return cpu
                                         return osUtil.getProcessList()
                                     }),
-                                    '80%'
+                                    '85%'
                                 )
                                 .addPane(
                                     get( 'vbox' )
                                     .addPane(
-                                        get('Table').init("Memory",()=>{
+                                        get('List').init("Memory",()=>{
                                             var memory = osUtil.getMemory();
                                             return memory
                                         })
                                     )
                                     .addPane(
-                                        get('Table').init("Disk",()=>{
+                                        get('List').init("Disk",()=>{
                                             var disk = osUtil.getDisk();
-                                            return disk[StructKeyArray(disk)[1]]
+                                            return disk[StructKeyArray(disk)[1]];
                                         })
                                     )
                                     .addPane(
-                                        get('Table').init("Network Info",()=>{
+                                        get('List').init("Network Info",()=>{
                                             var network = osUtil.getNetwork();
                                             return network
                                         })

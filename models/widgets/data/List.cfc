@@ -26,14 +26,12 @@ component extends='escher.models.AbstractWidget'  accessors=true {
         if( !isNull( dataProducer ) ) {
             while( isActive() ){
                 var data = dataProducer( this );
-
-                var dataArr = listToArray(print.table(data=data,width=getWidth()),"#chr(10)#")
-                var maxHeight = dataArr.len();
-                if(variables.height > 0 && variables.height < maxHeight ){
-                    maxHeight = variables.height;
+                var lines = [];
+                for(var key in data){
+                    lines.append(key & ": " & data[key])
                 }
-                dataArr = dataArr.slice(1,maxHeight);
-                setBuffer(dataArr);
+                
+                setBuffer(lines);
                 sleep( getProduceIntervalMS() )
             }
         }
