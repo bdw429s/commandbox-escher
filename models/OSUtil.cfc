@@ -7,7 +7,7 @@ component accessors=true{
     property name="platform";
     property name="os";
 
-    // byte units 
+    // byte units
     variables.TB = 1024 * 1024 * 1024 * 1024;
     variables.GB = 1024 * 1024 * 1024;
     variables.MB = 1024 * 1024;
@@ -33,7 +33,7 @@ component accessors=true{
 
     function getProcessList(){
         var totalRam = getHardware().getMemory().getTotal();
-        return getOS().getProcesses()
+        return getOS().getProcesses().filter( (p)=>p.getProcessID()>0 )
                 .reduce((acc,p,idx)=>{
                     try{
 
@@ -41,12 +41,12 @@ component accessors=true{
                             "PID": p.getProcessID(),
                             "Name": p.getName(),
                             //"ev": p.getEnvironmentVariables().toString(),
-                            "CDW":p.getCurrentWorkingDirectory(),
+                            "CWD":p.getCurrentWorkingDirectory(),
                             "CPU %": round(p.getProcessCpuLoadCumulative() * 100) & '%',
-                            "MEM %": (round(p.getResidentSetSize()*100/totalRam*100)) & '%',
-                            "Folder": listLast(p.getCurrentWorkingDirectory(),'/'),
+                            "MEM %": (round(p.getResidentSetSize()*100/totalRam)) & '%',
+                            //"Folder": listLast(p.getCurrentWorkingDirectory(),'/\x'),
                             "State": p.getState().toString(),
-                            "Disk": "(" & getSize(p.getBytesRead()) & "/" & getSize(p.getBytesWritten()) &")"
+                            "Disk R/W": "(" & getSize(p.getBytesRead()) & "/" & getSize(p.getBytesWritten()) &")"
                         ];
                         acc.append(threads);
                     } catch (any e){
@@ -55,7 +55,7 @@ component accessors=true{
                     return acc;
                 },[]).sort((a,b)=>{
                     var key = "CPU %";
-                    return compare(replace(b[key],"%","","All"),replace(a[key],"%","","All"))
+                    return replace(b[key],"%","","All") - replace(a[key],"%","","All")
                 })
     }
 
@@ -111,7 +111,7 @@ component accessors=true{
         }
         return services;
     }
-    
+
     function getCores(required coreid){
        var prevTicks =  getHardware().getProcessor().getProcessorCpuLoadTicks();
        sleep(1000);
@@ -149,9 +149,9 @@ component accessors=true{
     function getDisk(os) {
         var fileSystem = variables.getOS().getFileSystem();
         var fsArray = fileSystem.getFileStores();
-        return fsArray.filter((fs)=>{ return fs.getMount() == '/'})
+        return fsArray.filter((fs)=>{ return fs.getMount() == 'C:\' || fs.getMount() == '/'})
             .reduce((acc,fs)=>{
-            
+
             var diskInfo = {};
             var available = fs.getUsableSpace();
             var total = fs.getTotalSpace();

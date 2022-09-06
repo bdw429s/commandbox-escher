@@ -7,13 +7,58 @@ component {
 	*
 	*/
 	function run() {
+		var painter = getInstance( 'Painter@escher' );
 
-		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( inputLabel='Enter Passphrase: ', mask='*', onSubmit=(r)=>print.line( r ) ) );
+		painter.start(
+			getInstance( 'OverlayPanel@escher' ).init(
+				getInstance( 'Blank@escher' ),
+				getInstance( name='alert@escher', initArguments={ message="The British are coming!", type="error", onSubmit=()=>painter.stop() } )
+			)
+		);
 
-		getInstance( 'Painter@escher' ).start( getInstance( 'MiniChartDemo@escher' ).init(  ) );
-		return;
+		painter.start(
+			getInstance( 'OverlayPanel@escher' ).init(
+				getInstance( 'Blank@escher' ),
+				getInstance( name='confirm@escher', initArguments={  message="Release the robots? ", onSubmit=()=>painter.stop()} )
+			)
+		);
 
-		getInstance( 'Painter@escher' ).start(
+		painter.start(
+			getInstance( 'OverlayPanel@escher' ).init(
+				getInstance( 'Blank@escher' ),
+				getInstance( name='Prompt@escher', initArguments={ prompt='Enter New Value: ', onSubmit=()=>painter.stop() } )
+			)
+		);
+
+		painter.start(
+			getInstance( 'OverlayPanel@escher' ).init(
+				getInstance( 'Blank@escher' ),
+				getInstance( name='Dialog@escher', initArguments={
+					message : "This is some text which will be nicely word-wrapped.  The dialog will stretch to fit, and the buttons will be evently spaced below.",
+					label : "Hey, you!",
+					buttons : [
+						{
+							label : 'Yes',
+							hotKey : 'Y',
+							selected : true,
+							onSubmit : ()=>painter.stop()
+						},
+						{
+							label : 'No',
+							hotKey : 'N',
+							onSubmit : ()=>painter.stop()
+						},
+						{
+							label : 'Maybe',
+							hotKey : 'M',
+							onSubmit : ()=>painter.stop()
+						}
+					]
+				} )
+			)
+		);
+
+		 getInstance( 'Painter@escher' ).start(
 			getInstance( 'OverlayPanel@escher' ).init(
 				getInstance( 'HorizontalPanel@escher' )
 				.addPane(
@@ -29,65 +74,18 @@ component {
 						.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
 						.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
 						.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
-						.addPane( getInstance( 'TextInput@escher' ).init( 'Password: ' ) )
+						.addPane( getInstance( 'TextInput@escher' ).init( inputLabel='Password: ', mask='*' ) )
+						.addPane( getInstance( 'Button@escher' ).init( inputLabel='Save' ) )
 					 )
 					 .setLabel( 'Log Files' )
-				),
+				)//,
 				//getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
-				getInstance( 'confirm@escher' ).init( "Release the robots? ", (response, dialog)=>print.line( 'You confirmed [#response#]' ) )
+				//getInstance( 'confirm@escher' ).init( "Release the robots? ", (response, dialog)=>print.line( 'You confirmed [#response#]' ) )
 			)
 		);
 
+		task( 'ctop' ).run();
 
-		getInstance( 'Painter@escher' ).start( getInstance( 'Dialog@escher' ).init(
-			message : "This is some text which will be nicely wrapped.  The dialog will stretch to fit.",
-			label : "Hey, you!",
-			buttons : [
-				{
-                    label : 'Confirm',
-                    hotKey : 'C',
-                    selected : true,
-					onSubmit : (dialog)=>print.line( 'Confirmed!' )
-				},
-				{
-                    label : 'Cancel',
-                    hotKey : 'n',
-					onSubmit : (dialog)=>print.line( 'Cancelled!' )
-				}
-			]
-		 ) );
-
-		//return;
-
-		getInstance( 'Painter@escher' ).start( getInstance( 'Prompt@escher' ).init( 'Enter Passphrase: ', (r)=>print.line( r ) ) );
-		//return;
-		getInstance( 'Painter@escher' ).start( getInstance( 'alert@escher' ).init( "The British are coming!", "error" ) );
-		getInstance( 'Painter@escher' ).start( getInstance( 'confirm@escher' ).init( "Release the robots? ", (response, dialog)=>print.line( 'You confirmed [#response#]' ) ) );
-		//return;
-
-		getInstance( 'Painter@escher' ).start( getInstance( 'time@escher' ) );
-		getInstance( 'Painter@escher' ).start( getInstance( 'weather@escher' ) );
-		getInstance( 'Painter@escher' ).start( getInstance( 'scroller@escher' ) );
-		getInstance( 'Painter@escher' ).start( getInstance( 'chartDemo@escher' ).init( 'My Chart' ) );
-
-
-		getInstance( 'Painter@escher' ).start(
-			getInstance( 'HorizontalPanel@escher' )
-				.addPane( getInstance( 'VerticalPanel@escher' )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
-				)
-				.addPane( getInstance( 'VerticalPanel@escher' )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Password: ' ) )
-					.addPane( getInstance( 'TextInput@escher' ).init( 'Company: ' ) )
-					.addPane( getInstance( 'Button@escher' ).init( ' Save! ' ) )
-				)
-
-
-		);
-
-		print.greenLine( 'Complete!' );
 	}
 
 }

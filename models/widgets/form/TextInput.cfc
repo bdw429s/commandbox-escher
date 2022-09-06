@@ -32,7 +32,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
             inputValueToShow = repeatString( left( mask, 1 ), len( inputValue ) );
         }
         setBuffer( [
-           getInputLabel() & print.boldBlackOnSilverBackground( inputValueToShow & repeatString( ' ', (width-len(getInputLabel() & inputValue) ) ) )
+           getInputLabel() & print.BlackOnSilverBackground( inputValueToShow & repeatString( ' ', (width-len(getInputLabel() & inputValue) ) ) )
         ] );
 
         return super.render( height, width );

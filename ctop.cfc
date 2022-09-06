@@ -12,24 +12,25 @@ component {
     //    print.table( osUtil.getProcessList())
     }
 
-    
+
     function run() {
-        
-        
+
+
         get( 'Painter' ).start(
 		    get( 'OverlayPanel' ).init(
 					get( 'vbox' )
-						.addPane( 
+						.addPane(
                             get( 'hbox' )
 				            .addPane(
                                 get( 'vbox' ).init( { border : false } )
                                     .addPane(get('miniChart').init(
                                         title="CPU",
+                                        color='green',
                                         dataProducer=()=>{
                                             var cpu = osUtil.getCpu();
                                             return cpu.used;
                                         }
-                                    ))						            
+                                    ))
                                     .addPane( get('List').init(dataProducer=()=>{
                                         var cpu = osUtil.getCpu();
                                         return [
@@ -37,11 +38,12 @@ component {
                                             "Cores": cpu.coreNumber,
                                             "CPU Usage": cpu.used & '%'
                                         ]
-                                    }),'60%')					            
+                                    }),'60%')
                                     .addPane( get('Progress').init(dataProducer=()=>{
                                         var cpu = osUtil.getCpu();
                                         return cpu.used
-                                    }))
+                                    },
+                                    color='green'))
                             )
 				            .addPane(
                                 get( 'vbox' ).init( { border : false } )
@@ -65,7 +67,7 @@ component {
                                         var cpu = osUtil.getCores(3);
                                         return cpu.used;
                                     }
-                                ))	
+                                ))
                             )
 				            .addPane(
                                 get( 'vbox' ).init( { border : false } )
@@ -89,7 +91,7 @@ component {
                                         var cpu = osUtil.getCores(6);
                                         return cpu.used;
                                     }
-                                ))	
+                                ))
                             )
                             .addPane(
                                 get( 'vbox' ).init( { border : false } )
@@ -113,11 +115,11 @@ component {
                                         var cpu = osUtil.getCores(9);
                                         return cpu.used;
                                     }
-                                ))	
+                                ))
                             )
                             , '10' )
-						.addPane( 
-                            get( 'hbox' )
+						.addPane(
+                            get( 'hbox', { boxOptions={ border : false } } )
                                 .addPane(
                                     get('Table').init("CPU Usage",()=>{
                                         return osUtil.getProcessList()
@@ -151,15 +153,15 @@ component {
                                         })
                                     )
                                 )
-                        )	 
+                        )
 		    )
 		);
-        
+
     }
 
-    function get(required string widgetName){
+    function get(required string widgetName, struct initArguments={}){
         if(widgetName == 'hbox') widgetName = 'HorizontalPanel';
         if(widgetName == 'vbox') widgetName = 'VerticalPanel';
-        return getInstance("#widgetName#@escher");
+        return getInstance(name="#widgetName#@escher", initArguments=initArguments);
     }
 }
