@@ -39,23 +39,28 @@ component extends='escher.models.widgets.data.AbstractChart' accessors=true {
             var nextCharCode = '';
             var totalLine = '';
 
-            loop from="1" to=theData.len() index="local.i" {
-                var thisValue = theData[i];
-                if( len( nextCharCode ) == 2 ) {
-                    totalLine &= chr( chars[ nextCharCode ] );
-                    if( len( totalLine ) >= width ) {
-                        break;
+            if(theData.len()) {
+                
+                loop from="1" to=theData.len() index="local.i" {
+                    var thisValue = theData[i];
+                    if( len( nextCharCode ) == 2 ) {
+                        totalLine &= chr( chars[ nextCharCode ] );
+                        if( len( totalLine ) >= width ) {
+                            break;
+                        }
+                        nextCharCode = '';
                     }
-                    nextCharCode = '';
+                    nextCharCode &= int( (thisValue/YMax)*4 );
                 }
-                nextCharCode &= int( (thisValue/YMax)*4 );
+                if( len( nextCharCode ) == 1 ) {
+                    totalLine &= chr( chars[ nextCharCode & '0' ] );
+                } else {
+                    totalLine &= chr( chars[ nextCharCode ] );
+                }
+
             }
-            if( len( nextCharCode ) == 1 ) {
-                totalLine &= chr( chars[ nextCharCode & '0' ] );
-            } else {
-                totalLine &= chr( chars[ nextCharCode ] );
-            }
-            setBuffer( [ print.t( totalLine, color ) ] );
+
+            setBuffer( [getTitle() & ": " & print.t( totalLine, color )] );
             return super.render( argumentCollection=arguments );
     }
 
