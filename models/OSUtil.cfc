@@ -32,27 +32,31 @@ component accessors=true{
     }
 
     function getProcessList(){
+        var totalRam = getHardware().getMemory().getTotal();
         return getOS().getProcesses()
                 .reduce((acc,p,idx)=>{
                     try{
 
-                        var threads = {
-                            "name": p.getName(),
-                            "pid": p.getProcessID(),
+                        var threads = [
+                            "PID": p.getProcessID(),
+                            "Name": p.getName(),
                             //"ev": p.getEnvironmentVariables().toString(),
-                            "cwd":p.getCurrentWorkingDirectory(),
-                            "cpu": round(p.getProcessCpuLoadCumulative() * 100) & '%',
-                            "folder": listLast(p.getCurrentWorkingDirectory(),'/'),
-                            "resident": getSize(p.getResidentSetSize()),
-                            "virtual": getSize(p.getVirtualSize()),
-                            "service": listLast(p.getCurrentWorkingDirectory(),'/')
-                        }
+                            "CDW":p.getCurrentWorkingDirectory(),
+                            "CPU %": round(p.getProcessCpuLoadCumulative() * 100) & '%',
+                            "MEM %": (round(p.getResidentSetSize()*100/totalRam*100)) & '%',
+                            "Folder": listLast(p.getCurrentWorkingDirectory(),'/'),
+                            "State": p.getState().toString(),
+                            "Disk": "(" & getSize(p.getBytesRead()) & "/" & getSize(p.getBytesWritten()) &")"
+                        ];
                         acc.append(threads);
                     } catch (any e){
 
                     }
                     return acc;
-                },[])
+                },[]).sort((a,b)=>{
+                    var key = "CPU %";
+                    return compare(replace(b[key],"%","","All"),replace(a[key],"%","","All"))
+                })
     }
 
     function getNetwork() {
@@ -68,13 +72,13 @@ component accessors=true{
     }
 
     function getCpu(processor) {
-        var cpuInfo = {};
+        var cpuInfo = [=];
         var processor = variables.getHardware().getPRocessor();
         cpuInfo["name"]= processor.getProcessorIdentifier().getName();
-        cpuInfo["package"]= processor.getPhysicalPackageCount();
-        cpuInfo["core"]= processor.getPhysicalProcessorCount();
+        //cpuInfo["package"]= processor.getPhysicalPackageCount();
+        //cpuInfo["core"]= processor.getPhysicalProcessorCount();
         cpuInfo["coreNumber"]= processor.getPhysicalProcessorCount();
-        cpuInfo["logic"]= processor.getLogicalProcessorCount();
+       // cpuInfo["logic"]= processor.getLogicalProcessorCount();
         var prevTicks = processor.getSystemCpuLoadTicks();
         sleep(1000);
         var ticks = processor.getSystemCpuLoadTicks();
@@ -152,16 +156,15 @@ component accessors=true{
             var available = fs.getUsableSpace();
             var total = fs.getTotalSpace();
             var used = total - available;
-            diskInfo["dirName"] = fs.getMount();
-            diskInfo["sysTypeName"] = fs.getType();
-            diskInfo["typeName"] = fs.getName();
-            diskInfo["total"] = total > 0 ? getSize(total) : "?";
-            diskInfo["available"] = getSize(available);
-            diskInfo["used"] = getSize(used);
+            diskInfo["Directory Name"] = fs.getMount();
+            diskInfo["Name"] = fs.getName();
+            diskInfo["Total Space"] = total > 0 ? getSize(total) : "?";
+            diskInfo["Free Space"] = getSize(available);
+            diskInfo["Used Space"] = getSize(used);
             if(total != 0){
-                diskInfo["usageRate"] = decimalFormat(used/total * 100);
+                diskInfo["Used"] = decimalFormat(used/total * 100) & '%';
             } else {
-                diskInfo["usageRate"]=  0;
+                diskInfo["Used"]=  0 & '%';
             }
             acc[fs.name] = diskInfo;
             return acc;

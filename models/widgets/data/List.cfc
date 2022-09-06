@@ -14,7 +14,7 @@ component extends='escher.models.AbstractWidget'  accessors=true {
     variables.data  = [];
 
     function init( string title='', function dataProducer, numeric produceIntervalMS=1000 ) {
-        setTitle( title );
+        setLabel( title );
         setProduceIntervalMS( produceIntervalMS );
         if( !isNull( dataProducer ) ) {
             setDataProducer( dataProducer );

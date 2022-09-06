@@ -29,10 +29,18 @@ component {
                                             var cpu = osUtil.getCpu();
                                             return cpu.used;
                                         }
-                                    ),1)						            
-                                    .addPane( get('List').init("CPU Usage",()=>{
+                                    ))						            
+                                    .addPane( get('List').init(dataProducer=()=>{
                                         var cpu = osUtil.getCpu();
-                                        return cpu
+                                        return [
+                                            "Model": cpu.name,
+                                            "Cores": cpu.coreNumber,
+                                            "CPU Usage": cpu.used & '%'
+                                        ]
+                                    }),'60%')					            
+                                    .addPane( get('Progress').init(dataProducer=()=>{
+                                        var cpu = osUtil.getCpu();
+                                        return cpu.used
                                     }))
                             )
 				            .addPane(
@@ -83,6 +91,30 @@ component {
                                     }
                                 ))	
                             )
+                            .addPane(
+                                get( 'vbox' ).init( { border : false } )
+                                .addPane(get('miniChart').init(
+                                    title="Core 7",
+                                    dataProducer=()=>{
+                                        var cpu = osUtil.getCores(7);
+                                        return cpu.used;
+                                    }
+                                ))
+                                .addPane(get('miniChart').init(
+                                    title="Core 8",
+                                    dataProducer=()=>{
+                                        var cpu = osUtil.getCores(8);
+                                        return cpu.used;
+                                    }
+                                ))
+                                .addPane(get('miniChart').init(
+                                    title="Core 9",
+                                    dataProducer=()=>{
+                                        var cpu = osUtil.getCores(9);
+                                        return cpu.used;
+                                    }
+                                ))	
+                            )
                             , '10' )
 						.addPane( 
                             get( 'hbox' )
@@ -90,7 +122,7 @@ component {
                                     get('Table').init("CPU Usage",()=>{
                                         return osUtil.getProcessList()
                                     }),
-                                    '85%'
+                                    '87%'
                                 )
                                 .addPane(
                                     get( 'vbox' )
@@ -99,6 +131,12 @@ component {
                                             var memory = osUtil.getMemory();
                                             return memory
                                         })
+                                    )
+                                    .addPane(
+                                        get('Progress').init("Memory Usage",()=>{
+                                            var memory = osUtil.getMemory();
+                                            return memory.usageRate
+                                        }),'5'
                                     )
                                     .addPane(
                                         get('List').init("Disk",()=>{
