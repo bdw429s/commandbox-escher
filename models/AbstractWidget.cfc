@@ -16,6 +16,7 @@ component implements='escher.models.IDrawable' accessors=true {
     property name="backBuffer" type="array";
     // An array of structs containing all composed widgets.  Each struct can have any keys, but will always have a 'widget' key.
     property name="children" type="array";
+    property name="parent";
     // Listeners for emitted events
     property name="listeners" type="struct";
     property name="active" type="boolean" default=false;
@@ -171,6 +172,27 @@ component implements='escher.models.IDrawable' accessors=true {
         }
         // Never propagate
         return false;
+    }
+
+    /**
+     * Sets a parent-aware child
+     */
+    function addChild( iDrawable child, struct properties, position=children.len()+1 ) {
+        child.setParent( this );
+        properties.widget = child;
+        children[ position ] = properties;
+        return this;
+    }
+
+    function findAncestor( required string type ) {
+        var current = this;
+        while( !isNull( current.getParent() ) ){
+            current = current.getParent();
+            if( isInstanceOf( current, type ) ) {
+                return current;
+            }
+        }
+
     }
 
     /**

@@ -7,10 +7,12 @@ component extends='escher.models.AbstractWidget' accessors=true {
     property name='inputName' type='string';
     property name='hotKey' type='string';
     property name='onSubmit';
+    property name='type';
     property name='depressed' type='boolean' default='false';
 
-    function init( string inputLabel=' Submit ',string inputName='button', hotKey='', onSubmit ) {
+    function init( string inputLabel=' Submit ',string inputName='button', hotKey='', onSubmit, type="" ) {
         setInputLabel( inputLabel );
+        setType( type );
         setInputName( inputName );
         setHotKey( hotKey );
         if( !isNUll( arguments.onSubmit ) ) {
@@ -43,6 +45,12 @@ component extends='escher.models.AbstractWidget' accessors=true {
         sleep(200)
         if( !isNUll( variables.onSubmit ) ) {
             variables.onSubmit( this );
+        }
+        if( getType() == 'submit' ) {
+            var ancestorForm = findAncestor( 'Form' );
+            if( !isNull( ancestorForm ) ) {
+                ancestorForm.submit()
+            }
         }
     }
 

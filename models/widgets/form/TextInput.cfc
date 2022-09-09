@@ -9,11 +9,16 @@ component extends='escher.models.AbstractWidget' accessors=true {
     property name='maxLength' type='numeric';
     property name='mask' type='string';
 
-    function init( string inputLabel='Input Here: ', string inputName='Input Here: ', maxLength=50, mask='' ) {
+    function init( string inputLabel='', string inputName, maxLength=50, mask='' ) {
         setInputLabel( inputLabel );
         setMaxLength( maxLength );
+        setInputName( arguments.inputName ?: inputLabel );
         setMask( mask );
         registerListener( 'onKey', (data)=>doKey( data.key ), ()=>isFocused() );
+        registerListener( 'onFormDataCollection', (data)=>{
+            data.formData[ getInputName() ] = data.formData[ getInputName() ] ?: '';
+            data.formData[ getInputName() ] = data.formData[ getInputName() ].listAppend( inputValue );
+        } );
         return this;
     }
 

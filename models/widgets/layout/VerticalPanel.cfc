@@ -57,11 +57,13 @@ component extends='escher.models.AbstractWidget' accessors=true {
      * @width N% for percentage, N for set number of cols, -1 for auto-scaling based on parent size
      */
     function addPane( iDrawable widget, height=-1 ) {
-        children.append( {
-            widget : widget,
-            requestedHeight : height,
-            actualHeight : 0
-        } );
+        addChild(
+            widget,
+            {
+                requestedHeight : height,
+                actualHeight : 0
+            }
+        );
         if( isActive() ) {
             widget.start();
         }

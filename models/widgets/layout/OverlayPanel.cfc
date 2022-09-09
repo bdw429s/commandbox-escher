@@ -63,7 +63,7 @@ component extends='escher.models.AbstractWidget' accessors=true{
 
     function addOverlay( iDrawable widget ) {
         setOverlay( widget )
-        children[2] =  { widget : widget };
+        addChild( widget, {}, 2 );
         if( isActive() ) {
             widget.start();
         }

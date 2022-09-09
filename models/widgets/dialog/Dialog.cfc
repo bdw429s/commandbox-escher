@@ -36,7 +36,7 @@ component extends='escher.models.AbstractWidget' accessors=true {
                 )
             ) );
 
-            children.append( { widget : buttonPanel } );
+            addChild( buttonPanel );
         }
 
         return this;

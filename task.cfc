@@ -8,7 +8,7 @@ component {
 	*/
 	function run() {
 		var painter = getInstance( 'Painter@escher' );
-
+/*
 		painter.start(
 			getInstance( 'OverlayPanel@escher' ).init(
 				getInstance( 'Blank@escher' ),
@@ -57,8 +57,8 @@ component {
 				} )
 			)
 		);
-
-		 getInstance( 'Painter@escher' ).start(
+*/
+		painter.start(
 			getInstance( 'OverlayPanel@escher' ).init(
 				getInstance( 'HorizontalPanel@escher' )
 				.addPane(
@@ -70,13 +70,17 @@ component {
 				 )
 				.addPane( getInstance( 'VerticalPanel@escher' )
 					.addPane( getInstance( 'Scroller@escher' ), '50%' )
-					.addPane( getInstance( 'VerticalPanel@escher' ).init( { border : false } )
-						.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
-						.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
-						.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
-						.addPane( getInstance( 'TextInput@escher' ).init( inputLabel='Password: ', mask='*' ) )
-						.addPane( getInstance( 'Button@escher' ).init( inputLabel='Save' ) )
-					 )
+					.addPane(
+						getInstance( name : 'Form@escher', initArguments : {
+							child : getInstance( 'VerticalPanel@escher' ).init( { border : false } )
+										.addPane( getInstance( 'TextInput@escher' ).init( 'Name: ' ) )
+										.addPane( getInstance( 'TextInput@escher' ).init( 'Age: ' ) )
+										.addPane( getInstance( 'TextInput@escher' ).init( 'Color: ' ) )
+										.addPane( getInstance( 'TextInput@escher' ).init( inputLabel='Password: ', mask='*' ) )
+										.addPane( getInstance( 'Button@escher' ).init( inputLabel='Save', type="submit" ) ),
+							onSubmit : (formData)=>print.line(formData)
+						} )
+					)
 					 .setLabel( 'Log Files' )
 				)//,
 				//getInstance( 'prompt@escher' ).init( 'Enter Password: ' )
@@ -84,7 +88,7 @@ component {
 			)
 		);
 
-		task( 'ctop' ).run();
+	//	task( 'ctop' ).run();
 
 	}
 

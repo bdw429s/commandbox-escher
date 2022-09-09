@@ -60,12 +60,14 @@ component extends='escher.models.AbstractWidget' accessors=true {
     function addPane( iDrawable widget, width=-1 ) {
 
         //  Array of children to display.  Each item contains struct with widget CFC instance, requestedWith, actualWidth, and lines
-        children.append( {
-            widget : widget,
-            requestedWidth : width,
-            actualWidth : 0,
-            lines=[]
-        } );
+        addChild(
+            widget,
+            {
+                requestedWidth : width,
+                actualWidth : 0,
+                lines=[]
+            }
+        );
         if( isActive() ) {
             widget.start();
         }
